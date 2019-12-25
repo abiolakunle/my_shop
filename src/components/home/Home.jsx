@@ -3,6 +3,8 @@ import { Header } from "../header/index";
 import { Footer } from "../footer/index";
 import { SignIn } from "../SignIn/index";
 import { SignUp } from "../SignUp/index";
+
+//material-ui
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 
@@ -15,6 +17,7 @@ const useStyles = makeStyles(theme => ({
     opacity: 0.95,
     margin: theme.spacing(10)
   },
+
   container: {
     backgroundImage: `url(${home_bg})`
   }
@@ -28,7 +31,7 @@ const Home = () => {
       <Header />
       <Fragment>
         <Paper className={classes.paper}>
-          <Grid container spacing={10}>
+          <Grid container alignItems="center" spacing={10}>
             <Grid item md={6}>
               <SignIn />
             </Grid>

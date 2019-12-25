@@ -9,19 +9,35 @@ import {
 
 import { success, failure, request } from "actions/requestActions";
 import {
-  signIn as SignInService,
-  signUp as SignUpService
+  signIn as signInService,
+  signUp as signUpService
 } from "services/authService";
 
-export const signIn = ({ userName, password }) => {};
+export const signIn = credentials => {
+  return (dispatch, getState) => {
+    dispatch(request(SIGN_IN_REQUEST));
+    signInService(credentials)
+      .then(response => {
+        dispatch(success(SIGN_IN_SUCCESS, "Sign in successful"));
+      })
+      .catch(({ message }) => {
+        dispatch(failure(SIGN_IN_ERROR, message));
+        console.log("Sign in error", message);
+      });
+  };
+};
 
 export const signUp = credentials => {
   return (dispatch, getState) => {
     dispatch(request(SIGN_UP_REQUEST));
 
-    SignUpService(credentials).then(response => {
-      dispatch(success(SIGN_UP_SUCCESS));
-      console.log("Sign up resonse", response);
-    });
+    signUpService(credentials)
+      .then(response => {
+        dispatch(success(SIGN_UP_SUCCESS, "Sign up successful"));
+      })
+      .catch(({ message }) => {
+        dispatch(failure(SIGN_UP_ERROR, message));
+        console.log("Sign up error", message);
+      });
   };
 };

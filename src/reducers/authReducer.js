@@ -17,17 +17,12 @@ const initialState = {
 export const signInReducer = (state = initialState, action) => {
   switch (action.type) {
     case SIGN_IN_REQUEST:
-      return {
-        signingIn: true,
-        ...state
-      };
+      return { ...state, signingIn: true, error: false };
     case SIGN_IN_SUCCESS:
-      return {
-        signingIn: false,
-        signedIn: true
-      };
+      return { ...state, signingIn: false, signedIn: true };
     case SIGN_IN_ERROR:
       return {
+        ...state,
         signingIn: false,
         error: true,
         message: action.payload
@@ -47,20 +42,18 @@ const initialStateSignUp = {
 export const signUpReducer = (state = initialStateSignUp, action) => {
   switch (action.type) {
     case SIGN_UP_REQUEST:
-      return {
-        signingUp: true,
-        error: false,
-        signedUp: false,
-        ...state
-      };
+      return { ...state, signingUp: true, error: false, signedUp: false };
     case SIGN_UP_SUCCESS:
       return {
+        ...state,
         signingUp: false,
         error: false,
-        signedUp: true
+        signedUp: true,
+        message: action.payload
       };
     case SIGN_UP_ERROR:
       return {
+        ...state,
         signingUp: false,
         error: true,
         message: action.payload
