@@ -1,0 +1,17 @@
+.nav-link {
+  display: inline-block;
+}
+
+.nav-links {
+  position: relative;
+  float: right;
+}
+
+.nav-branding {
+  font-size: large;
+  font-weight: 600;
+}
+
+.nav-bar {
+  padding: 10px;
+}
