@@ -16,8 +16,6 @@ import Container from "@material-ui/core/Container";
 import { useDispatch, useSelector } from "react-redux";
 
 import { signUp } from "actions/authActions";
-import { SnackBarContent } from "components/snackBar";
-import Snackbar from "@material-ui/core/Snackbar";
 
 import { useSnackbar } from "notistack";
 
@@ -50,21 +48,35 @@ const useStyles = makeStyles(theme => ({
 const SignUp = ({ history }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
+
   const { signingUp, signedUp, error, message } = useSelector(
     state => state.signUpReducer
   );
 
+  //snack bar for sign up alerts
   const { enqueueSnackbar } = useSnackbar();
-  console.log("history", history);
+  useEffect(() => {
+    (error || signedUp) &&
+      enqueueSnackbar(message, {
+        variant: error ? "error" : "success",
+        anchorOrigin: {
+          vertical: "bottom",
+          horizontal: "right"
+        }
+      });
+    console.log("error changed", error);
+  }, [error, signedUp]);
+
+  //signedUp redirection
   if (signedUp) {
     history.push("/dashboard");
   }
 
+  //form state management
   const [form, setForm] = useState({
     email: "",
     password: ""
   });
-
   const handleFormChange = event => {
     setForm({
       ...form,
@@ -78,32 +90,9 @@ const SignUp = ({ history }) => {
     dispatch(signUp(form));
   };
 
-  const handleClose = () => {
-    //error = false;
-  };
-
   return (
     <Fragment>
       <Container component="main" maxWidth="xs">
-        {/* {(error || (signedUp && !signingUp)) &&
-          enqueueSnackbar(message, { variant: error ? "error" : "success" })} */}
-        {/* {signedUp && <Redirect to={`/dashboard`} />} */}
-        <Snackbar
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "right"
-          }}
-          open={error || signedUp}
-          autoHideDuration={2000}
-          onClose={handleClose}
-        >
-          <SnackBarContent
-            onClose={handleClose}
-            variant={error ? "error" : "success"}
-            message={message}
-          />
-        </Snackbar>
-
         <CssBaseline />
         <div className={classes.paper}>
           <Avatar className={classes.avatar}>

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import { useSnackbar } from "notistack";
 
 import { signIn } from "actions/authActions";
 
@@ -48,6 +49,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const SignIn = ({ history }) => {
+  const classes = useStyles();
   const [form, setForm] = useState({
     email: "",
     password: ""
@@ -57,11 +59,17 @@ const SignIn = ({ history }) => {
   const { signingIn, signedIn, error, message } = useSelector(
     state => state.signInReducer
   );
+
   if (signedIn) {
     history.push("/dashboard");
   }
 
-  const classes = useStyles();
+  //snack bar for sign in alerts
+  const { enqueueSnackbar } = useSnackbar();
+  useEffect(() => {
+    (error || signedIn) &&
+      enqueueSnackbar(message, { variant: error ? "error" : "success" });
+  }, [error, message]);
 
   const handleChange = event => {
     console.log(`${event.target.name} , ${event.target.value}`);
@@ -78,19 +86,6 @@ const SignIn = ({ history }) => {
 
   return (
     <Container component="main" maxWidth="xs">
-      <Snackbar
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right"
-        }}
-        open={error || signedIn}
-        autoHideDuration={2000}
-      >
-        <SnackBarContent
-          variant={error ? "error" : "success"}
-          message={message}
-        />
-      </Snackbar>
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>

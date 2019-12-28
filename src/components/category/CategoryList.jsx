@@ -1,18 +1,18 @@
 import React from "react";
 
 const products = [
-  { name: "Football" },
+  { name: "Soccer" },
   {
-    name: "Volley ball"
+    name: "Swimming"
   },
-  { name: "Net ball" }
+  { name: "Hockey" }
 ];
 
-const ProductList = props => {
+const CategoryList = props => {
   console.log("list", props);
   return (
     <div>
-      Product List
+      Category List
       <div>
         {products.map((item, index) => {
           return (
@@ -34,4 +34,4 @@ const ProductList = props => {
   );
 };
 
-export default ProductList;
+export default CategoryList;

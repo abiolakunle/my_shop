@@ -7,13 +7,24 @@ import * as serviceWorker from "./serviceWorker";
 import { Provider } from "react-redux";
 import store from "store/index";
 import { SnackbarProvider } from "notistack";
+import { ReactReduxFirebaseProvider } from "react-redux-firebase";
+import firebaseConfig from "firebase/config";
+import firebase from "firebase/index";
 
+const reactReduxfirebaseProps = {
+  firebase,
+  config: firebaseConfig,
+  dispatch: store.dispatch
+  // createFirestoreInstance // <- needed if using firestore
+};
 ReactDOM.render(
-  <SnackbarProvider maxSnack={3}>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </SnackbarProvider>,
+  <ReactReduxFirebaseProvider {...reactReduxfirebaseProps}>
+    <SnackbarProvider maxSnack={3}>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </SnackbarProvider>
+  </ReactReduxFirebaseProvider>,
   document.getElementById("root")
 );
 

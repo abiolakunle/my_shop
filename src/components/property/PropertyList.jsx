@@ -1,18 +1,18 @@
 import React from "react";
 
 const products = [
-  { name: "Football" },
+  { name: "Color" },
   {
-    name: "Volley ball"
+    name: "Size"
   },
-  { name: "Net ball" }
+  { name: "Model" }
 ];
 
-const ProductList = props => {
+const PropertyList = props => {
   console.log("list", props);
   return (
     <div>
-      Product List
+      Property List
       <div>
         {products.map((item, index) => {
           return (
@@ -34,4 +34,4 @@ const ProductList = props => {
   );
 };
 
-export default ProductList;
+export default PropertyList;

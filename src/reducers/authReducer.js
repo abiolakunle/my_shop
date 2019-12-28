@@ -19,7 +19,12 @@ export const signInReducer = (state = initialState, action) => {
     case SIGN_IN_REQUEST:
       return { ...state, signingIn: true, error: false };
     case SIGN_IN_SUCCESS:
-      return { ...state, signingIn: false, signedIn: true };
+      return {
+        ...state,
+        signingIn: false,
+        signedIn: true,
+        message: action.payload
+      };
     case SIGN_IN_ERROR:
       return {
         ...state,

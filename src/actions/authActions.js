@@ -12,13 +12,16 @@ import {
   signIn as signInService,
   signUp as signUpService
 } from "services/authService";
+import firebase from "firebase/index";
 
 export const signIn = credentials => {
   return (dispatch, getState) => {
     dispatch(request(SIGN_IN_REQUEST));
     signInService(credentials)
       .then(response => {
-        dispatch(success(SIGN_IN_SUCCESS, "Sign in successful"));
+        firebase.auth().onAuthStateChanged(user => {
+          dispatch(success(SIGN_IN_SUCCESS, "Sign in successful"));
+        });
       })
       .catch(({ message }) => {
         dispatch(failure(SIGN_IN_ERROR, message));
