@@ -62,34 +62,3 @@ export const authReducer = (state = initialState, action) => {
       return { ...state };
   }
 };
-
-const initialStateSignUp = {
-  signingUp: false,
-  signedUp: false,
-  error: false,
-  message: ""
-};
-
-export const signUpReducer = (state = initialStateSignUp, action) => {
-  switch (action.type) {
-    case SIGN_UP_REQUEST:
-      return { ...state, signingUp: true, error: false, signedUp: false };
-    case SIGN_UP_SUCCESS:
-      return {
-        ...state,
-        signingUp: false,
-        error: false,
-        signedUp: true,
-        message: action.payload
-      };
-    case SIGN_UP_ERROR:
-      return {
-        ...state,
-        signingUp: false,
-        error: true,
-        message: action.payload
-      };
-    default:
-      return { ...state };
-  }
-};
