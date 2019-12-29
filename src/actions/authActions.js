@@ -4,7 +4,8 @@ import {
   SIGN_IN_ERROR,
   SIGN_UP_REQUEST,
   SIGN_UP_SUCCESS,
-  SIGN_UP_ERROR
+  SIGN_UP_ERROR,
+  SIGN_OUT
 } from "constants/authConstants";
 
 import { success, failure, request } from "actions/requestActions";
@@ -19,9 +20,10 @@ export const signIn = credentials => {
     dispatch(request(SIGN_IN_REQUEST));
     signInService(credentials)
       .then(response => {
-        firebase.auth().onAuthStateChanged(user => {
-          dispatch(success(SIGN_IN_SUCCESS, "Sign in successful"));
-        });
+        dispatch(success(SIGN_IN_SUCCESS, "Sign in successful"));
+        // firebase.auth().onAuthStateChanged(user => {
+        //   //console.log("Auth state changed", authReducer.signedIn);
+        // });
       })
       .catch(({ message }) => {
         dispatch(failure(SIGN_IN_ERROR, message));
@@ -36,11 +38,23 @@ export const signUp = credentials => {
 
     signUpService(credentials)
       .then(response => {
+        dispatch(success(SIGN_IN_SUCCESS, "Sign in successful"));
         dispatch(success(SIGN_UP_SUCCESS, "Sign up successful"));
       })
       .catch(({ message }) => {
         dispatch(failure(SIGN_UP_ERROR, message));
         console.log("Sign up error", message);
+      });
+  };
+};
+
+export const signOut = () => {
+  return (dispatch, getState) => {
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        dispatch({ type: SIGN_OUT });
       });
   };
 };

@@ -1,4 +1,5 @@
 import React, { Fragment } from "react";
+import { useSelector } from "react-redux";
 import { Header } from "../header/index";
 import { Footer } from "../footer/index";
 import { SignIn } from "../SignIn/index";
@@ -23,8 +24,14 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const Home = () => {
+const Home = ({ history }) => {
   const classes = useStyles();
+
+  const auth = useSelector(state => state.firebaseReducer.auth);
+  console.log("Home", auth);
+  if (!auth.isEmpty && auth.uid) {
+    history.push("/dashboard");
+  }
 
   return (
     <div className={classes.container}>

@@ -19,8 +19,6 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { Snackbar } from "@material-ui/core";
-import { SnackBarContent } from "components/snackBar";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -48,37 +46,32 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SignIn = ({ history }) => {
+const SignIn = () => {
   const classes = useStyles();
-  const [form, setForm] = useState({
-    email: "",
-    password: ""
-  });
 
   const dispatch = useDispatch();
-  const { signingIn, signedIn, error, message } = useSelector(
-    state => state.signInReducer
+  const { signingIn, signedIn, signInError, message } = useSelector(
+    state => state.authReducer
   );
-
-  if (signedIn) {
-    history.push("/dashboard");
-  }
 
   //snack bar for sign in alerts
   const { enqueueSnackbar } = useSnackbar();
   useEffect(() => {
-    (error || signedIn) &&
-      enqueueSnackbar(message, { variant: error ? "error" : "success" });
-  }, [error, message]);
+    (signInError || signedIn) &&
+      enqueueSnackbar(message, { variant: signInError ? "error" : "success" });
+  }, [signInError, signedIn]);
 
+  //form state management
+  const [form, setForm] = useState({
+    email: "",
+    password: ""
+  });
   const handleChange = event => {
-    console.log(`${event.target.name} , ${event.target.value}`);
     setForm({
       ...form,
       [event.target.name]: event.target.value
     });
   };
-
   const handleSubmit = event => {
     event.preventDefault();
     dispatch(signIn(form));
@@ -155,4 +148,4 @@ const SignIn = ({ history }) => {
   );
 };
 
-export default withRouter(SignIn);
+export default SignIn;

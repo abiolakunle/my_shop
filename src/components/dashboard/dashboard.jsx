@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useSnackbar } from "notistack";
 import { Product } from "components/product/index";
 import { Category } from "components/category/index";
 import { Property } from "components/property/index";
-import { signOut } from "services/authService";
+import { signOut } from "actions/authActions";
 
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -89,8 +90,7 @@ const Dashboard = props => {
   };
 
   //redux
-  // const firebase = useSelector(state => state);
-  // console.log("firebse", firebase);
+  const dispatch = useDispatch();
 
   //tab changes
   const tabLabels = ["Products", "Categories", "Properties"];
@@ -100,6 +100,20 @@ const Dashboard = props => {
     setTitle(tabLabels[newValue]);
     setCurrent(newValue);
   };
+
+  //snack bar for sign up alerts
+  const signedOut = useSelector(state => state.authReducer.signedOut);
+  const { enqueueSnackbar } = useSnackbar();
+  useEffect(() => {
+    signedOut &&
+      enqueueSnackbar("Signed out", {
+        variant: "info",
+        anchorOrigin: {
+          vertical: "bottom",
+          horizontal: "right"
+        }
+      });
+  }, [signedOut]);
 
   const drawer = (
     <div>
@@ -121,7 +135,7 @@ const Dashboard = props => {
       <Divider />
       <Button
         onClick={() => {
-          signOut();
+          dispatch(signOut());
         }}
       >
         Sign out
@@ -195,15 +209,5 @@ const Dashboard = props => {
     </div>
   );
 };
-
-// Dashboard.propTypes = {
-//   /**
-//    * Injected by the documentation to work in an iframe.
-//    * You won't need it on your project.
-//    */
-//   container: PropTypes.instanceOf(
-//     typeof Element === "undefined" ? Object : Element
-//   )
-// };
 
 export default Dashboard;

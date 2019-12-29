@@ -1,5 +1,4 @@
 import React, { useState, useEffect, Fragment } from "react";
-import { withRouter } from "react-router-dom";
 
 //material-ui
 import Avatar from "@material-ui/core/Avatar";
@@ -45,32 +44,26 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SignUp = ({ history }) => {
+const SignUp = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const { signingUp, signedUp, error, message } = useSelector(
-    state => state.signUpReducer
+  const { signingUp, signedUp, signUpError, message } = useSelector(
+    state => state.authReducer
   );
 
   //snack bar for sign up alerts
   const { enqueueSnackbar } = useSnackbar();
   useEffect(() => {
-    (error || signedUp) &&
+    (signUpError || signedUp) &&
       enqueueSnackbar(message, {
-        variant: error ? "error" : "success",
+        variant: signUpError ? "error" : "success",
         anchorOrigin: {
           vertical: "bottom",
-          horizontal: "right"
+          horizontal: signUpError ? "right" : "left"
         }
       });
-    console.log("error changed", error);
-  }, [error, signedUp]);
-
-  //signedUp redirection
-  if (signedUp) {
-    history.push("/dashboard");
-  }
+  }, [signUpError, signedUp]);
 
   //form state management
   const [form, setForm] = useState({
@@ -82,7 +75,6 @@ const SignUp = ({ history }) => {
       ...form,
       [event.target.name]: event.target.value
     });
-    //console.log(`${event.target.name} , ${event.target.value}`);
   };
 
   const handleSubmit = event => {
@@ -182,4 +174,4 @@ const SignUp = ({ history }) => {
   );
 };
 
-export default withRouter(SignUp);
+export default SignUp;

@@ -10,12 +10,13 @@ import { SnackbarProvider } from "notistack";
 import { ReactReduxFirebaseProvider } from "react-redux-firebase";
 import firebaseConfig from "firebase/config";
 import firebase from "firebase/index";
+import { createFirestoreInstance } from "redux-firestore";
 
 const reactReduxfirebaseProps = {
   firebase,
   config: firebaseConfig,
-  dispatch: store.dispatch
-  // createFirestoreInstance // <- needed if using firestore
+  dispatch: store.dispatch,
+  createFirestoreInstance
 };
 ReactDOM.render(
   <ReactReduxFirebaseProvider {...reactReduxfirebaseProps}>
