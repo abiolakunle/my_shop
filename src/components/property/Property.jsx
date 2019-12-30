@@ -19,11 +19,12 @@ const useStyles = makeStyles(theme => ({
 
 const Property = () => {
   const classes = useStyles();
-  const [edit, setEdit] = useState({ name: "Football" });
+  const [edit, setEdit] = useState();
 
   const setItemEdit = item => {
     setEdit(item);
   };
+
   return (
     <div className={classes.root}>
       <Grid container spacing={3}>
@@ -34,7 +35,7 @@ const Property = () => {
         </Grid>
         <Grid item xs={6}>
           <Paper className={classes.paper}>
-            <PropertyEdit edit={edit} />
+            <PropertyEdit {...edit} />
           </Paper>
         </Grid>
       </Grid>

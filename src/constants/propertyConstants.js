@@ -1,0 +1,3 @@
+export const ADD_PROP_REQUEST = "ADD_PROP_REQUEST";
+export const ADD_PROP_SUCCESS = " ADD_PROP_SUCCESS";
+export const ADD_PROP_FAILURE = " ADD_PROP_FAILURE";
