@@ -19,7 +19,7 @@ const initialState = {
   message: ""
 };
 
-export const authReducer = (state = initialState, action) => {
+const authReducer = (state = initialState, action) => {
   switch (action.type) {
     case SIGN_IN_REQUEST:
       return { ...state, signingIn: true, signInError: false };
@@ -62,3 +62,5 @@ export const authReducer = (state = initialState, action) => {
       return { ...state };
   }
 };
+
+export default authReducer;

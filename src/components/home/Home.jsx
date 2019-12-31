@@ -38,7 +38,7 @@ const Home = ({ history }) => {
       <Header />
       <Fragment>
         <Paper className={classes.paper}>
-          <Grid container alignItems="center" spacing={10}>
+          <Grid container alignItems="center" spacing={2}>
             <Grid item md={6}>
               <SignIn />
             </Grid>

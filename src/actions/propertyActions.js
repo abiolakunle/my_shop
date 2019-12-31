@@ -6,23 +6,20 @@ import {
 
 import { request, success, failure } from "actions/requestActions";
 
-import { add, update, remove } from "services/populateProperty";
-import {
-  addValue,
-  updateValue,
-  removeValue
-} from "actions/propertyValueActions";
+import {  remove } from "services/populateProperty";
+import { add, update } from "services/populateServices";
+import { addValue, updateValue } from "actions/propertyValueActions";
 
-export const addProperty = ({ values, ...rest }) => {
+const type = "properties";
+
+export const addProperty = property => {
+
   return (dispatch, getState) => {
     dispatch(request(ADD_PROP_REQUEST));
 
-    add({ ...rest })
-      .then(({ id }) => {
-        dispatch(success(ADD_PROP_SUCCESS, "Property added"));
-        values.forEach(value => {
-          dispatch(addValue({ name: value, propertyId: id }));
-        });
+    add(property, type)
+      .then(() => {
+        dispatch(success(ADD_PROP_SUCCESS, `${property.name} property added`));
         console.log("add prop success");
       })
       .catch(({ message }) => {
@@ -32,20 +29,11 @@ export const addProperty = ({ values, ...rest }) => {
   };
 };
 
-export const updateProperty = (id, { values, ...rest }) => {
+export const updateProperty = (id, property) => {
   return (dispatch, getState) => {
-    console.log("prop update", id, rest);
-    update(id, rest)
+    update(property, type, id)
       .then(docRef => {
-        console.log("Prop updated", docRef);
-        values.forEach(({ id: valueId, ...rest }) => {
-          console.log("rest", { ...rest });
-          if (valueId) {
-            dispatch(updateValue(valueId, { ...rest }));
-          } else {
-            dispatch(addValue({ propertyId: id, ...rest }));
-          }
-        });
+        console.log("property update success", docRef);
       })
       .catch(({ message }) => {
         console.error("update property error ", message);

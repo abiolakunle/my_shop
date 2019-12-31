@@ -49,6 +49,7 @@ const useStyles = makeStyles(theme => ({
 const SignIn = () => {
   const classes = useStyles();
 
+  //redux
   const dispatch = useDispatch();
   const { signingIn, signedIn, signInError, message } = useSelector(
     state => state.authReducer

@@ -11,6 +11,9 @@ import { ReactReduxFirebaseProvider } from "react-redux-firebase";
 import firebaseConfig from "firebase/config";
 import firebase from "firebase/index";
 import { createFirestoreInstance } from "redux-firestore";
+import { Provider as AlertProvider } from "react-alert";
+import AlertTemplate from "react-alert-template-basic";
+import { alertOptions } from "helpers/alert";
 
 const reactReduxfirebaseProps = {
   firebase,
@@ -22,7 +25,9 @@ ReactDOM.render(
   <ReactReduxFirebaseProvider {...reactReduxfirebaseProps}>
     <SnackbarProvider maxSnack={3}>
       <Provider store={store}>
-        <App />
+        <AlertProvider template={AlertTemplate} {...alertOptions}>
+          <App />
+        </AlertProvider>
       </Provider>
     </SnackbarProvider>
   </ReactReduxFirebaseProvider>,

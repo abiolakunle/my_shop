@@ -13,3 +13,7 @@ export const update = (id, property) => {
 export const remove = id => {
   return db.doc(id).delete();
 };
+
+// const temp =  {name: "name", values: [{name: "name" ,value: "value"}, {name: "name", value: "value"}]}
+
+// values: [{name: "name" ,value: "value"}, {name: "name", value: "value"}]

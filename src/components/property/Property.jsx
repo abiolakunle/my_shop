@@ -21,21 +21,17 @@ const Property = () => {
   const classes = useStyles();
   const [edit, setEdit] = useState();
 
-  const setItemEdit = item => {
-    setEdit(item);
-  };
-
   return (
     <div className={classes.root}>
       <Grid container spacing={3}>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <Paper className={classes.paper}>
-            <PropertyList setEdit={setItemEdit} />
+            <PropertyList edit={edit} setEdit={setEdit} />
           </Paper>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <Paper className={classes.paper}>
-            <PropertyEdit {...edit} />
+            <PropertyEdit edit={edit} setEdit={setEdit} />
           </Paper>
         </Grid>
       </Grid>

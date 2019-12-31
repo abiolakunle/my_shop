@@ -1,4 +1,5 @@
 export const request = type => {
+  console.log(`Request started`);
   return {
     type
   };

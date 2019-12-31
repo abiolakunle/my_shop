@@ -26,8 +26,6 @@ export const addValue = value => {
 
 export const updateValue = (id, value) => {
   return (dispatch, getState) => {
-    console.log("prop update", id, value);
-
     update(id, value)
       .then(docRef => {
         console.log("Prop value ", value, " updated");
@@ -42,7 +40,7 @@ export const removeValue = ({ id }) => {
   return (dispatch, getState) => {
     remove(id)
       .then(() => {
-        console.log("value  deleted ", id);
+        console.log(id, " value delete success");
       })
       .catch(({ message }) => {
         console.error("delete value error ", message);
