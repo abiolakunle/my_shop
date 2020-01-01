@@ -1,6 +1,5 @@
 import React, { Fragment, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { remove } from "actions/populateActions";
+import { useSelector } from "react-redux";
 import DeleteDialog from "components/deleteDialog/DeleteDialog";
 
 import { useFirestoreConnect } from "react-redux-firebase";
@@ -13,11 +12,22 @@ import {
   ListItemText,
   ListItemAvatar,
   Avatar as MaterialAvatar,
-  CircularProgress
+  CircularProgress,
+  ButtonBase
 } from "@material-ui/core";
 import Avatar from "react-avatar";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
+
+const ListButton = ({ children, ...rest }) => {
+  return (
+    <ButtonBase style={{ "border-radius": "50%" }} {...rest}>
+      <IconButton style={{ "pointer-events": "none" }}>
+        {React.cloneElement(children, { style: { "pointer-events": "none" } })}
+      </IconButton>
+    </ButtonBase>
+  );
+};
 
 const PropertyList = props => {
   useFirestoreConnect([{ collection: "properties" }]);
@@ -25,16 +35,29 @@ const PropertyList = props => {
     state => state.firestoreReducer
   );
 
-  const [open, setOpen] = useState(false);
-  const deleteDialog = () => {
-    setOpen(!open);
-    console.log("open", open);
+  const [deleteItem, setDeleteItem] = useState(undefined);
+  const deleteDialog = item => {
+    setDeleteItem(deleteItem ? undefined : item);
   };
-
   return (
     <div>
       Property List
-      <div>
+      <div
+        onClick={event => {
+          const dataAction = event.target.getAttribute("data-action");
+          const id = event.target.getAttribute("data-id");
+
+          switch (dataAction) {
+            case "delete":
+              deleteDialog(ordered.properties[id]);
+              break;
+            case "edit":
+              props.setEdit(ordered.properties[id]);
+              break;
+            default:
+          }
+        }}
+      >
         <List dense={true}>
           {!data.properties &&
             !status?.requesting.properties &&
@@ -43,7 +66,7 @@ const PropertyList = props => {
           {status?.requested.properties &&
             ordered.properties.map((item, index) => {
               return (
-                <Fragment>
+                <Fragment key={index}>
                   <ListItem>
                     <ListItemAvatar>
                       <MaterialAvatar>
@@ -55,40 +78,36 @@ const PropertyList = props => {
                       // secondary={""}
                     />
                     <ListItemSecondaryAction>
-                      <IconButton
-                        onClick={event => {
-                          event.preventDefault();
-                          props.setEdit(item);
-                        }}
+                      <ListButton
+                        data-action="edit"
                         edge="end"
                         aria-label="edit"
+                        data-id={index}
                       >
                         <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        onClick={event => {
-                          event.preventDefault();
-                          deleteDialog();
-                        }}
-                        edge="ends"
+                      </ListButton>
+                      <ListButton
+                        data-action="delete"
+                        edge="end"
                         aria-label="delete"
+                        data-id={index}
                       >
                         <DeleteIcon />
-                      </IconButton>
+                      </ListButton>
                     </ListItemSecondaryAction>
                   </ListItem>
                   <Divider variant="inset" component="li" />
-                  {open && (
-                    <DeleteDialog
-                      item={item}
-                      open={open}
-                      handleClose={deleteDialog}
-                    />
-                  )}
                 </Fragment>
               );
             })}
         </List>
+        {deleteItem && (
+          <DeleteDialog
+            item={deleteItem}
+            open={!!deleteItem}
+            handleClose={deleteDialog}
+          />
+        )}
       </div>
     </div>
   );

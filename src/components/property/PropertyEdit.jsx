@@ -15,7 +15,8 @@ import {
   DialogTitle,
   DialogContentText,
   DialogActions,
-  Dialog
+  Dialog,
+  Box
 } from "@material-ui/core";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
@@ -28,6 +29,12 @@ const useStyles = makeStyles(theme => ({
   },
   button: {
     marginBottom: theme.spacing(2)
+  },
+  center: {
+    display: "flex",
+    flexDirection: "column",
+    margin: "auto",
+    width: "fit-content"
   }
 }));
 
@@ -57,12 +64,10 @@ const PropertyEdit = ({ edit, setEdit, open, setOpen }) => {
     }
   ]);
   const { ordered, data } = useSelector(state => state.firestoreReducer);
+  const propertyValues = ordered?.propertyValues;
   useEffect(() => {
-    const values = ordered?.propertyValues?.map(propertyValue => {
-      return propertyValue;
-    });
-    setForm({ ...edit, propertyValues: values });
-  }, [edit, ordered]);
+    setForm({ ...edit, propertyValues });
+  }, [edit, propertyValues]);
 
   //add propertyValues
   const onAdd = chip => {
@@ -169,13 +174,18 @@ const PropertyEdit = ({ edit, setEdit, open, setOpen }) => {
             className={classes.root}
             onSubmit={handleSubmit}
             autoComplete="off"
-            validate
           >
             <DialogTitle id="scroll-dialog-title">
               {edit ? "Edit " : "Add "}
               {"property"}
             </DialogTitle>
-            <DialogContent dividers={true}>{formInputs}</DialogContent>
+            <DialogContent dividers={true}>
+              {formInputs}
+              <Box className={classes.center}>
+                {sending && <CircularProgress />}
+              </Box>
+            </DialogContent>
+
             <DialogActions>
               {
                 <Button
@@ -195,6 +205,7 @@ const PropertyEdit = ({ edit, setEdit, open, setOpen }) => {
                 color="primary"
                 className={classes.button}
                 type="submit"
+                disabled={sending}
               >
                 {edit ? "Update" : "Add"}
               </Button>

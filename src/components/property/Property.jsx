@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { resetState } from "actions/populateActions";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
@@ -23,7 +25,10 @@ const Property = () => {
   const classes = useStyles();
   const [edit, setEdit] = useState();
   const [openEdit, setOpenEdit] = useState(false);
+
+  const dispatch = useDispatch();
   const openAndEdit = edit => {
+    dispatch(resetState());
     setEdit(edit);
     setOpenEdit(true);
   };
@@ -39,6 +44,7 @@ const Property = () => {
         <Fab color="secondary" aria-label="add" className={classes.fabButton}>
           <AddIcon
             onClick={() => {
+              dispatch(resetState());
               setOpenEdit(true);
             }}
           />

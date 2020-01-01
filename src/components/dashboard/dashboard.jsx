@@ -128,7 +128,7 @@ const Dashboard = props => {
         className={classes.tabs}
       >
         {tabLabels.map((label, index) => {
-          return <Tab label={label} {...a11yProps(index)} />;
+          return <Tab label={label} key={index} {...a11yProps(index)} />;
         })}
       </Tabs>
 

@@ -1,7 +1,8 @@
 import {
   POPULATE_REQUEST,
   POPULATE_SUCCESS,
-  POPULATE_FAILURE
+  POPULATE_FAILURE,
+  POPULATE_RESET
 } from "constants/populateConstants";
 
 const intialState = {
@@ -31,6 +32,8 @@ const populateReducer = (state = intialState, action) => {
         error: true,
         message: action.payload
       };
+    case POPULATE_RESET:
+      return { ...intialState };
     default:
       return { ...state };
   }

@@ -1,7 +1,8 @@
 import {
   POPULATE_REQUEST,
   POPULATE_SUCCESS,
-  POPULATE_FAILURE
+  POPULATE_FAILURE,
+  POPULATE_RESET
 } from "constants/populateConstants";
 
 import { request, success, failure } from "actions/requestActions";
@@ -36,7 +37,7 @@ export const update = collection => {
       updateService(entity, collection, id)
         .then(() => {
           dispatch(
-            success(POPULATE_SUCCESS, `${entity.name} update in ${collection}`)
+            success(POPULATE_SUCCESS, `${entity.name} updated in ${collection}`)
           );
         })
         .catch(({ message }) => {
@@ -64,4 +65,9 @@ export const remove = collection => {
         });
     };
   };
+};
+
+export const resetState = () => {
+  console.log("REset");
+  return { type: POPULATE_RESET };
 };

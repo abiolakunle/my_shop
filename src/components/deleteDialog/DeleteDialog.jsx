@@ -10,7 +10,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { useFirestoreConnect } from "react-redux-firebase";
 
-const AlertDialog = ({ open = false, handleClose, item }) => {
+const AlertDialog = ({ open, handleClose, item }) => {
   const collection = "properties";
   useFirestoreConnect([
     {
