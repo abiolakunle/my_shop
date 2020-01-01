@@ -47,13 +47,16 @@ export const update = collection => {
 };
 
 export const remove = collection => {
-  return ({ id, name }) => {
+  return entity => {
     return (dispatch, getState) => {
       dispatch(request(POPULATE_REQUEST));
-      removeService(collection, id)
+      removeService(collection, entity)
         .then(() => {
           dispatch(
-            success(POPULATE_SUCCESS, `${name} deleted from ${collection}`)
+            success(
+              POPULATE_SUCCESS,
+              `${entity.name} deleted from ${collection}`
+            )
           );
         })
         .catch(({ message }) => {

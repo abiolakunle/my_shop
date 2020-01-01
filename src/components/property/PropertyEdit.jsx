@@ -8,7 +8,17 @@ import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import ChipInput from "material-ui-chip-input";
-import { Button, CircularProgress } from "@material-ui/core";
+import {
+  Button,
+  CircularProgress,
+  DialogContent,
+  DialogTitle,
+  DialogContentText,
+  DialogActions,
+  Dialog
+} from "@material-ui/core";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { useTheme } from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
   chipInput: { minWidth: 300, marginBottom: theme.spacing(4) },
@@ -21,8 +31,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const PropertyEdit = ({ edit, setEdit }) => {
+const PropertyEdit = ({ edit, setEdit, open, setOpen }) => {
   const classes = useStyles();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
 
   //redux
   const dispatch = useDispatch();
@@ -73,13 +85,14 @@ const PropertyEdit = ({ edit, setEdit }) => {
   //handle alerts and progress
   const alert = useAlert();
   const { sending, sent, error, message } = useSelector(state => {
-    console.log("state", state.populateReducer);
+    console.log("state", state);
     return state.populateReducer;
   });
   useEffect(() => {
     if (sent || error) {
       alert.show(message, { type: error ? "error" : "success" });
       sent && resetForm();
+      sent && setOpen(false);
     }
   }, [sent, error, message]);
 
@@ -110,80 +123,85 @@ const PropertyEdit = ({ edit, setEdit }) => {
       alert.show("Please add at least one property value", { type: "info" });
     }
   };
+  const formInputs = (
+    <Grid container spacing={3}>
+      <Grid item xs={12}>
+        <TextField
+          id="name"
+          name="name"
+          label="Property name"
+          fullWidth
+          placeholder="Enter property name, e.g. Color "
+          value={form.name}
+          onChange={handleChange}
+          required
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <ChipInput
+          className={classes.chipInput}
+          helperText="Type value, hit enter to type another"
+          value={form.propertyValues?.map(value => value.name)}
+          onAdd={onAdd}
+          onDelete={onDelete}
+          placeholder="Enter values for property, e.g. Red"
+          fullWidth
+        />
+      </Grid>
+    </Grid>
+  );
 
   return (
     <React.Fragment>
-      <Typography variant="h6" gutterBottom>
-        Property form
-      </Typography>
-      {edit && !data.propertyValues ? (
-        <CircularProgress />
-      ) : (
-        <form
-          className={classes.root}
-          onSubmit={handleSubmit}
-          autoComplete="off"
-        >
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <TextField
-                id="name"
-                name="name"
-                label="Property name"
-                fullWidth
-                placeholder="Enter property name, e.g. Color "
-                value={form.name}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <ChipInput
-                className={classes.chipInput}
-                helperText="Type value, hit enter to type another"
-                value={form.propertyValues?.map(value => value.name)}
-                onAdd={onAdd}
-                onDelete={onDelete}
-                placeholder="Enter values for property, e.g. Red"
-                fullWidth
-              />
-            </Grid>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                {sending && <CircularProgress />}
-              </Grid>
-              <Grid item xs={12}>
-                <Grid container>
-                  <Grid item xs={edit ? 6 : 12}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      className={classes.button}
-                      type="submit"
-                    >
-                      {edit ? "Update" : "Add"}
-                    </Button>
-                  </Grid>
-                  {edit && (
-                    <Grid item xs={6}>
-                      <Button
-                        variant="contained"
-                        color="light"
-                        className={classes.button}
-                        onClick={() => {
-                          resetForm();
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                    </Grid>
-                  )}
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        </form>
-      )}
+      <Dialog
+        fullScreen={fullScreen}
+        open={open}
+        scroll={"paper"}
+        onClose={() => {
+          setOpen(false);
+        }}
+        aria-labelledby="responsive-dialog-title"
+      >
+        {edit && !data.propertyValues ? (
+          <CircularProgress />
+        ) : (
+          <form
+            className={classes.root}
+            onSubmit={handleSubmit}
+            autoComplete="off"
+            validate
+          >
+            <DialogTitle id="scroll-dialog-title">
+              {edit ? "Edit " : "Add "}
+              {"property"}
+            </DialogTitle>
+            <DialogContent dividers={true}>{formInputs}</DialogContent>
+            <DialogActions>
+              {
+                <Button
+                  variant="contained"
+                  color="light"
+                  className={classes.button}
+                  onClick={() => {
+                    resetForm();
+                    setOpen(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              }
+              <Button
+                variant="contained"
+                color="primary"
+                className={classes.button}
+                type="submit"
+              >
+                {edit ? "Update" : "Add"}
+              </Button>
+            </DialogActions>
+          </form>
+        )}
+      </Dialog>
     </React.Fragment>
   );
 };

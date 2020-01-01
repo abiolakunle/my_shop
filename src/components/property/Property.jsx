@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
+import AddIcon from "@material-ui/icons/Add";
 
 import PropertyEdit from "./PropertyEdit";
 import PropertyList from "./PropertyList";
+import { Fab } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -20,20 +22,35 @@ const useStyles = makeStyles(theme => ({
 const Property = () => {
   const classes = useStyles();
   const [edit, setEdit] = useState();
+  const [openEdit, setOpenEdit] = useState(false);
+  const openAndEdit = edit => {
+    setEdit(edit);
+    setOpenEdit(true);
+  };
 
   return (
     <div className={classes.root}>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <PropertyList edit={edit} setEdit={setEdit} />
+            <PropertyList edit={edit} setEdit={openAndEdit} />
           </Paper>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Paper className={classes.paper}>
-            <PropertyEdit edit={edit} setEdit={setEdit} />
-          </Paper>
-        </Grid>
+        <Fab color="secondary" aria-label="add" className={classes.fabButton}>
+          <AddIcon
+            onClick={() => {
+              setOpenEdit(true);
+            }}
+          />
+        </Fab>
+        {openEdit && (
+          <PropertyEdit
+            open={openEdit}
+            setOpen={setOpenEdit}
+            edit={edit}
+            setEdit={setEdit}
+          />
+        )}
       </Grid>
     </div>
   );

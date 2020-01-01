@@ -1,6 +1,7 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { remove } from "actions/populateActions";
+import DeleteDialog from "components/deleteDialog/DeleteDialog";
 
 import { useFirestoreConnect } from "react-redux-firebase";
 import {
@@ -23,10 +24,13 @@ const PropertyList = props => {
   const { status, ordered, data } = useSelector(
     state => state.firestoreReducer
   );
-  const store = useSelector(state => state.firestoreReducer);
 
-  const dispatch = useDispatch();
-  const collection = "properties";
+  const [open, setOpen] = useState(false);
+  const deleteDialog = () => {
+    setOpen(!open);
+    console.log("open", open);
+  };
+
   return (
     <div>
       Property List
@@ -64,9 +68,9 @@ const PropertyList = props => {
                       <IconButton
                         onClick={event => {
                           event.preventDefault();
-                          dispatch(remove(collection)(item));
+                          deleteDialog();
                         }}
-                        edge="end"
+                        edge="ends"
                         aria-label="delete"
                       >
                         <DeleteIcon />
@@ -74,6 +78,13 @@ const PropertyList = props => {
                     </ListItemSecondaryAction>
                   </ListItem>
                   <Divider variant="inset" component="li" />
+                  {open && (
+                    <DeleteDialog
+                      item={item}
+                      open={open}
+                      handleClose={deleteDialog}
+                    />
+                  )}
                 </Fragment>
               );
             })}
