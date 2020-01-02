@@ -31,10 +31,10 @@ export const add = collection => {
 };
 
 export const update = collection => {
-  return (id, entity) => {
+  return entity => {
     return (dispatch, getState) => {
       dispatch(request(POPULATE_REQUEST));
-      updateService(entity, collection, id)
+      updateService(entity, collection)
         .then(() => {
           dispatch(
             success(POPULATE_SUCCESS, `${entity.name} updated in ${collection}`)
@@ -67,7 +67,6 @@ export const remove = collection => {
   };
 };
 
-export const resetState = () => {
-  console.log("REset");
+export const resetPopulate = () => {
   return { type: POPULATE_RESET };
 };

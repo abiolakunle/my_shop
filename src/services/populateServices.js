@@ -26,6 +26,7 @@ const getRelations = entity => {
 };
 
 export const addService = (entity, type, updateId) => {
+  console.log("Entity", entity);
   const entityName = pluralize.singular(type);
   let fields = getFields(entity);
   let relations = getRelations(entity);
@@ -46,15 +47,15 @@ export const addService = (entity, type, updateId) => {
           addService({ ...value, [`${entityName}Id`]: docRef.id }, key);
         } else {
           const { id, ...rest } = value;
-          addService({ ...rest }, key, id);
+          addService({ ...rest, [`${entityName}Id`]: updateId }, key, id);
         }
       });
     });
   });
 };
 
-export const updateService = (entity, type, updateId) => {
-  return addService(entity, type, updateId);
+export const updateService = ({ id, ...rest }, type) => {
+  return addService({ ...rest }, type, id);
 };
 
 export const removeService = (type, { id, ...rest }) => {

@@ -4,7 +4,6 @@ import { useFirestoreConnect } from "react-redux-firebase";
 import { useAlert } from "react-alert";
 import { add, update, remove } from "actions/populateActions";
 import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import ChipInput from "material-ui-chip-input";
@@ -13,7 +12,6 @@ import {
   CircularProgress,
   DialogContent,
   DialogTitle,
-  DialogContentText,
   DialogActions,
   Dialog,
   Box
@@ -46,15 +44,15 @@ const PropertyEdit = ({ edit, setEdit, open, setOpen }) => {
   //redux
   const dispatch = useDispatch();
 
+  const initialFormState = { name: "", propertyValues: [] };
   //form state management
-  const [form, setForm] = useState({
-    name: "",
-    propertyValues: []
-  });
+  const [form, setForm] = useState(initialFormState);
   const resetForm = () => {
     setEdit(undefined);
-    setForm({ name: "", propertyValues: [] });
+    setForm(initialFormState);
   };
+
+  console.log("form ..", form);
 
   // firestore
   useFirestoreConnect([
@@ -66,7 +64,7 @@ const PropertyEdit = ({ edit, setEdit, open, setOpen }) => {
   const { ordered, data } = useSelector(state => state.firestoreReducer);
   const propertyValues = ordered?.propertyValues;
   useEffect(() => {
-    setForm({ ...edit, propertyValues });
+    edit && setForm({ ...edit, propertyValues });
   }, [edit, propertyValues]);
 
   //add propertyValues
@@ -90,7 +88,6 @@ const PropertyEdit = ({ edit, setEdit, open, setOpen }) => {
   //handle alerts and progress
   const alert = useAlert();
   const { sending, sent, error, message } = useSelector(state => {
-    console.log("state", state);
     return state.populateReducer;
   });
   useEffect(() => {
@@ -112,13 +109,14 @@ const PropertyEdit = ({ edit, setEdit, open, setOpen }) => {
     event.preventDefault();
     if (form.propertyValues.length) {
       if (edit) {
-        const { id, ...rest } = form;
         //update
-        dispatch(update(collection)(id, { ...rest }));
+        dispatch(update(collection)(form));
+        //subCollection items delete
+        const subCollection = "propertyValues";
         deleted.length &&
           deleted.forEach(item => {
             //delete
-            dispatch(remove(collection)(item));
+            dispatch(remove(subCollection)(item));
           });
       } else {
         //add

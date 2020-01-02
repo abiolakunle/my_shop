@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { resetState } from "actions/populateActions";
+import { resetPopulate } from "actions/populateActions";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
@@ -28,7 +28,7 @@ const Property = () => {
 
   const dispatch = useDispatch();
   const openAndEdit = edit => {
-    dispatch(resetState());
+    dispatch(resetPopulate());
     setEdit(edit);
     setOpenEdit(true);
   };
@@ -41,13 +41,16 @@ const Property = () => {
             <PropertyList edit={edit} setEdit={openAndEdit} />
           </Paper>
         </Grid>
-        <Fab color="secondary" aria-label="add" className={classes.fabButton}>
-          <AddIcon
-            onClick={() => {
-              dispatch(resetState());
-              setOpenEdit(true);
-            }}
-          />
+        <Fab
+          color="secondary"
+          aria-label="add"
+          className={classes.fabButton}
+          onClick={() => {
+            dispatch(resetPopulate());
+            setOpenEdit(true);
+          }}
+        >
+          <AddIcon />
         </Fab>
         {openEdit && (
           <PropertyEdit

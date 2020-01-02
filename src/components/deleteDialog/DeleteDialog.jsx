@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useAlert } from "react-alert";
 import { remove } from "actions/populateActions";
 
 import Button from "@material-ui/core/Button";
@@ -9,6 +10,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { useFirestoreConnect } from "react-redux-firebase";
+import { CircularProgress } from "@material-ui/core";
 
 const AlertDialog = ({ open, handleClose, item }) => {
   const collection = "properties";
@@ -21,9 +23,17 @@ const AlertDialog = ({ open, handleClose, item }) => {
 
   //redux
   const dispatch = useDispatch();
-  const { status, ordered, data } = useSelector(
-    state => state.firestoreReducer
+  const { ordered } = useSelector(state => state.firestoreReducer);
+  const { sending, sent, error, message } = useSelector(
+    state => state.populateReducer
   );
+  const alert = useAlert();
+  useEffect(() => {
+    if (sent || error) {
+      alert.show(message, { type: error ? "error" : "success" });
+      sent && handleClose();
+    }
+  }, [sent, error, message]);
 
   const handleDelete = () => {
     const toDelete = {
@@ -51,9 +61,17 @@ const AlertDialog = ({ open, handleClose, item }) => {
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleDelete} color="primary" autoFocus>
+          <Button
+            onClick={handleDelete}
+            color="primary"
+            disabled={!!!ordered.propertyValues}
+            autoFocus
+          >
             Delete
           </Button>
+          {(!!!ordered.propertyValues || sending) && (
+            <CircularProgress size={20} />
+          )}
         </DialogActions>
       </Dialog>
     </div>

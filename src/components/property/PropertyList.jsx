@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import DeleteDialog from "components/deleteDialog/DeleteDialog";
+import { resetPopulate } from "actions/populateActions";
 
 import { useFirestoreConnect } from "react-redux-firebase";
 import {
@@ -35,6 +36,8 @@ const PropertyList = props => {
     state => state.firestoreReducer
   );
 
+  const dispatch = useDispatch();
+
   const [deleteItem, setDeleteItem] = useState(undefined);
   const deleteDialog = item => {
     setDeleteItem(deleteItem ? undefined : item);
@@ -46,7 +49,7 @@ const PropertyList = props => {
         onClick={event => {
           const dataAction = event.target.getAttribute("data-action");
           const id = event.target.getAttribute("data-id");
-
+          dispatch(resetPopulate());
           switch (dataAction) {
             case "delete":
               deleteDialog(ordered.properties[id]);
