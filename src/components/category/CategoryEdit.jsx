@@ -14,7 +14,13 @@ import {
   DialogTitle,
   DialogActions,
   Dialog,
-  Box
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  Input,
+  Chip,
+  MenuItem
 } from "@material-ui/core";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
@@ -33,8 +39,43 @@ const useStyles = makeStyles(theme => ({
     flexDirection: "column",
     margin: "auto",
     width: "fit-content"
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+    maxWidth: 300
+  },
+  chips: {
+    display: "flex",
+    flexWrap: "wrap"
+  },
+  chip: {
+    margin: 2
+  },
+  noLabel: {
+    marginTop: theme.spacing(3)
   }
 }));
+
+const getStyles = (name, personName, theme) => {
+  return {
+    fontWeight:
+      personName.indexOf(name) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium
+  };
+};
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250
+    }
+  }
+};
 
 const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
   const classes = useStyles();
@@ -44,7 +85,7 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
   //redux
   const dispatch = useDispatch();
 
-  const initialFormState = { name: "", propertyValues: [] };
+  const initialFormState = { name: "", categoryProperties: [] };
   //form state management
   const [form, setForm] = useState(initialFormState);
   const resetForm = () => {
@@ -52,37 +93,55 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
     setForm(initialFormState);
   };
 
-  console.log("form ..", form);
+  //console.log("form ..", form);
 
   // firestore
   useFirestoreConnect([
     {
-      collection: "propertyValues",
-      where: ["propertyId", "==", edit?.id || ""]
+      collection: "categoryProperties",
+      where: ["categoryId", "==", edit?.id || ""]
+    },
+    {
+      collection: "properties"
     }
   ]);
   const { ordered, data } = useSelector(state => state.firestoreReducer);
-  const propertyValues = ordered?.propertyValues;
-  useEffect(() => {
-    edit && setForm({ ...edit, propertyValues });
-  }, [edit, propertyValues]);
+  console.log("ordered", ordered);
 
-  //add propertyValues
-  const onAdd = chip => {
-    setForm({
-      ...form,
-      propertyValues: [...form.propertyValues, { name: chip }]
+  const filterSelectedProperties = (
+    properties = [],
+    categoryProperties = []
+  ) => {
+    return properties.filter(({ id }) => {
+      return categoryProperties
+        .map(({ propertyId }) => propertyId)
+        .includes(id);
     });
   };
 
-  //delete propertyValues
-  const [deleted, setDeleted] = useState([]);
-  const onDelete = (chip, index) => {
-    setDeleted([...deleted, form.propertyValues[index]]);
-    const newValues = form.propertyValues
-      .slice(0, index)
-      .concat(form.propertyValues.slice(index + 1));
-    setForm({ ...form, propertyValues: [...newValues] });
+  const [current, setCurrent] = useState([]);
+  useEffect(() => {
+    const categoryProperties = filterSelectedProperties(
+      ordered.properties,
+      ordered.categoryProperties
+    );
+    setCurrent(categoryProperties);
+    console.log("catProps", categoryProperties);
+    edit && setForm({ ...edit, categoryProperties });
+  }, [edit, ordered]);
+
+  //all properties
+  const [allProperties, setAllProperties] = useState([]);
+  useEffect(() => {
+    setAllProperties(ordered.properties);
+  }, [ordered]);
+
+  //add categoryProperties
+  const onAdd = chip => {
+    setForm({
+      ...form,
+      categoryProperties: [...form.categoryProperties, { name: chip }]
+    });
   };
 
   //handle alerts and progress
@@ -99,28 +158,66 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
   }, [sent, error, message]);
 
   //handle from state change
+  const [added, setAdded] = useState([]);
+  const [removed, setRemoved] = useState([]);
+
+  const getAdded = (selected, current) => {
+    console.log("selected", selected, "current", current);
+    const result = selected.filter(
+      ({ id }) => !current.map(({ id }) => id).includes(id)
+    );
+    console.log("Added: ", result);
+    return result;
+  };
+  const getRemoved = (selected, current) => {
+    console.log("selected", selected, "current", current);
+    const result = current.filter(
+      ({ id }) => !selected.map(({ id }) => id).includes(id)
+    );
+    console.log("Removed: ", result);
+    return result;
+  };
+
+  useEffect(() => {
+    setAdded(getAdded(form.categoryProperties, current));
+    setRemoved(getRemoved(form.categoryProperties, current));
+  }, [form]);
+
   const handleChange = event => {
+    console.log("change", event.target);
     setForm({ ...form, [event.target.name]: event.target.value });
   };
 
   //handle form submission
-  const collection = "properties";
+  const collection = "categories";
   const handleSubmit = event => {
     event.preventDefault();
-    if (form.propertyValues.length) {
+    if (form.categoryProperties.length) {
       if (edit) {
         //update
-        dispatch(update(collection)(form));
-        //subCollection items delete
-        const subCollection = "propertyValues";
-        deleted.length &&
-          deleted.forEach(item => {
-            //delete
-            dispatch(remove(subCollection)(item));
+        const AddedPropertyIds = added.map(property => ({
+          propertyId: property.id
+        }));
+        dispatch(
+          update(collection)({ ...form, categoryProperties: AddedPropertyIds })
+        );
+        //subCollection items to delete
+        const getRemovedIds = (removed, categoryProperties) => {
+          return categoryProperties.filter(({ propertyId }) => {
+            return removed.map(({ id }) => id).includes(propertyId);
           });
+        };
+        const subCollection = "categoryProperties";
+        getRemovedIds(removed, ordered.categoryProperties).forEach(item => {
+          //delete
+          dispatch(remove(subCollection)(item));
+        });
       } else {
         //add
-        dispatch(add(collection)(form));
+        const propertyIds = form.categoryProperties.map(property => ({
+          propertyId: property.id
+        }));
+        dispatch(add(collection)({ ...form, categoryProperties: propertyIds }));
       }
     } else {
       alert.show("Please add at least one property value", { type: "info" });
@@ -140,16 +237,42 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
           required
         />
       </Grid>
+
       <Grid item xs={12}>
-        <ChipInput
-          className={classes.chipInput}
-          helperText="Type value, hit enter to type another"
-          value={form.propertyValues?.map(value => value.name)}
-          onAdd={onAdd}
-          onDelete={onDelete}
-          placeholder="Enter values for property, e.g. Red"
-          fullWidth
-        />
+        <FormControl className={classes.formControl}>
+          <InputLabel id="demo-mutiple-chip-label">Chip</InputLabel>
+          <Select
+            labelId="demo-mutiple-chip-label"
+            id="demo-mutiple-chip"
+            multiple
+            value={form.categoryProperties}
+            name="categoryProperties"
+            onChange={handleChange}
+            input={<Input id="select-multiple-chip" />}
+            renderValue={selected => (
+              <div className={classes.chips}>
+                {selected.map(value => (
+                  <Chip
+                    key={value.name}
+                    label={value.name}
+                    className={classes.chip}
+                  />
+                ))}
+              </div>
+            )}
+            MenuProps={MenuProps}
+          >
+            {allProperties?.map(property => (
+              <MenuItem
+                key={property.id}
+                value={property}
+                style={getStyles(property, form.categoryProperties, theme)}
+              >
+                {property.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Grid>
     </Grid>
   );
@@ -165,7 +288,7 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
         }}
         aria-labelledby="responsive-dialog-title"
       >
-        {edit && !data.propertyValues ? (
+        {edit && !data.categoryProperties ? (
           <CircularProgress />
         ) : (
           <form
@@ -175,7 +298,7 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
           >
             <DialogTitle id="scroll-dialog-title">
               {edit ? "Edit " : "Add "}
-              {"property"}
+              {"category"}
             </DialogTitle>
             <DialogContent dividers={true}>
               {formInputs}

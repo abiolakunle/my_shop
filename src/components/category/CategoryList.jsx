@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import DeleteDialog from "components/deleteDialog/DeleteDialog";
+import DeleteDialog from "./DeleteDialog";
 import { resetPopulate } from "actions/populateActions";
 
 import { useFirestoreConnect } from "react-redux-firebase";
