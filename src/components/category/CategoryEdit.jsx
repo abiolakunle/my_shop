@@ -6,7 +6,6 @@ import { add, update, remove } from "actions/populateActions";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
-import ChipInput from "material-ui-chip-input";
 import {
   Button,
   CircularProgress,
@@ -57,12 +56,13 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const getStyles = (name, personName, theme) => {
+const getStyles = ({ deleted, added }, property, properties, theme) => {
   return {
     fontWeight:
-      personName.indexOf(name) === -1
+      properties.indexOf(property) === -1
         ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium
+        : theme.typography.fontWeightMedium,
+    backgroundColor: "primary !important"
   };
 };
 
@@ -88,14 +88,17 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
   const initialFormState = { name: "", categoryProperties: [] };
   //form state management
   const [form, setForm] = useState(initialFormState);
+
+  const handleChange = event => {
+    console.log("change", event.target);
+    setForm({ ...form, [event.target.name]: event.target.value });
+  };
   const resetForm = () => {
     setEdit(undefined);
     setForm(initialFormState);
   };
 
-  //console.log("form ..", form);
-
-  // firestore
+  //redux queries firestore
   useFirestoreConnect([
     {
       collection: "categoryProperties",
@@ -105,29 +108,28 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
       collection: "properties"
     }
   ]);
+  //get ordered data from firestore reducer
   const { ordered, data } = useSelector(state => state.firestoreReducer);
-  console.log("ordered", ordered);
 
-  const filterSelectedProperties = (
-    properties = [],
-    categoryProperties = []
-  ) => {
-    return properties.filter(({ id }) => {
+  //use property id to gets current properties from all properties list
+  const filterSelectedProperties = (properties, categoryProperties) => {
+    return properties?.filter(({ id }) => {
       return categoryProperties
-        .map(({ propertyId }) => propertyId)
+        ?.map(({ propertyId }) => propertyId)
         .includes(id);
     });
   };
 
+  //intial properties for category to be edited
   const [current, setCurrent] = useState([]);
   useEffect(() => {
-    const categoryProperties = filterSelectedProperties(
-      ordered.properties,
-      ordered.categoryProperties
+    const { properties, categoryProperties } = ordered;
+    const currentProperties = filterSelectedProperties(
+      properties,
+      categoryProperties
     );
-    setCurrent(categoryProperties);
-    console.log("catProps", categoryProperties);
-    edit && setForm({ ...edit, categoryProperties });
+    setCurrent(currentProperties);
+    edit && setForm({ ...edit, categoryProperties: currentProperties });
   }, [edit, ordered]);
 
   //all properties
@@ -135,14 +137,6 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
   useEffect(() => {
     setAllProperties(ordered.properties);
   }, [ordered]);
-
-  //add categoryProperties
-  const onAdd = chip => {
-    setForm({
-      ...form,
-      categoryProperties: [...form.categoryProperties, { name: chip }]
-    });
-  };
 
   //handle alerts and progress
   const alert = useAlert();
@@ -157,36 +151,36 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
     }
   }, [sent, error, message]);
 
-  //handle from state change
+  //store removed and added properties for category to be edited
   const [added, setAdded] = useState([]);
   const [removed, setRemoved] = useState([]);
 
+  //get new properties added to category properties
   const getAdded = (selected, current) => {
-    console.log("selected", selected, "current", current);
-    const result = selected.filter(
+    return selected?.filter(
       ({ id }) => !current.map(({ id }) => id).includes(id)
     );
-    console.log("Added: ", result);
-    return result;
   };
+
+  //get properties remove from category properties
   const getRemoved = (selected, current) => {
-    console.log("selected", selected, "current", current);
-    const result = current.filter(
+    return current?.filter(
       ({ id }) => !selected.map(({ id }) => id).includes(id)
     );
-    console.log("Removed: ", result);
-    return result;
+  };
+  //gets ids of removed categoryProperties
+  const getRemovedIds = (removed, categoryProperties) => {
+    return categoryProperties.filter(({ propertyId }) => {
+      return removed.map(({ id }) => id).includes(propertyId);
+    });
   };
 
+  //handle effect for change in added or remove properties
   useEffect(() => {
-    setAdded(getAdded(form.categoryProperties, current));
-    setRemoved(getRemoved(form.categoryProperties, current));
-  }, [form]);
-
-  const handleChange = event => {
-    console.log("change", event.target);
-    setForm({ ...form, [event.target.name]: event.target.value });
-  };
+    const { categoryProperties } = form;
+    setAdded(getAdded(categoryProperties, current));
+    setRemoved(getRemoved(categoryProperties, current));
+  }, [form, current]);
 
   //handle form submission
   const collection = "categories";
@@ -194,26 +188,21 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
     event.preventDefault();
     if (form.categoryProperties.length) {
       if (edit) {
-        //update
+        //extract ids of added properties
         const AddedPropertyIds = added.map(property => ({
           propertyId: property.id
         }));
-        dispatch(
-          update(collection)({ ...form, categoryProperties: AddedPropertyIds })
-        );
+        const dbForm = { ...form, categoryProperties: AddedPropertyIds };
+        //dispatch update
+        dispatch(update(collection)(dbForm));
         //subCollection items to delete
-        const getRemovedIds = (removed, categoryProperties) => {
-          return categoryProperties.filter(({ propertyId }) => {
-            return removed.map(({ id }) => id).includes(propertyId);
-          });
-        };
         const subCollection = "categoryProperties";
         getRemovedIds(removed, ordered.categoryProperties).forEach(item => {
-          //delete
+          //dispatch delete
           dispatch(remove(subCollection)(item));
         });
       } else {
-        //add
+        //extract ids of add properties
         const propertyIds = form.categoryProperties.map(property => ({
           propertyId: property.id
         }));
@@ -229,9 +218,9 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
         <TextField
           id="name"
           name="name"
-          label="Property name"
+          label="Category name"
           fullWidth
-          placeholder="Enter property name, e.g. Color "
+          placeholder="Enter property name, e.g. Shoes, Drinks, Electronics, ....  "
           value={form.name}
           onChange={handleChange}
           required
@@ -240,24 +229,27 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
 
       <Grid item xs={12}>
         <FormControl className={classes.formControl}>
-          <InputLabel id="demo-mutiple-chip-label">Chip</InputLabel>
+          <InputLabel id="demo-mutiple-chip-label">Properties</InputLabel>
           <Select
             labelId="demo-mutiple-chip-label"
             id="demo-mutiple-chip"
             multiple
-            value={form.categoryProperties}
+            value={form.categoryProperties || []}
             name="categoryProperties"
             onChange={handleChange}
             input={<Input id="select-multiple-chip" />}
             renderValue={selected => (
               <div className={classes.chips}>
-                {selected.map(value => (
-                  <Chip
-                    key={value.name}
-                    label={value.name}
-                    className={classes.chip}
-                  />
-                ))}
+                {selected.map(value => {
+                  console.log("value", value, "delete", removed);
+                  return (
+                    <Chip
+                      key={value.name}
+                      label={value.name}
+                      className={classes.chip}
+                    />
+                  );
+                })}
               </div>
             )}
             MenuProps={MenuProps}
@@ -266,7 +258,12 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
               <MenuItem
                 key={property.id}
                 value={property}
-                style={getStyles(property, form.categoryProperties, theme)}
+                style={getStyles(
+                  { removed, added },
+                  property,
+                  form.categoryProperties,
+                  theme
+                )}
               >
                 {property.name}
               </MenuItem>

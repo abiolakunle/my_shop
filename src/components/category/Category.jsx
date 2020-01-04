@@ -6,8 +6,8 @@ import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import AddIcon from "@material-ui/icons/Add";
 
-import PropertyEdit from "./CategoryEdit";
-import PropertyList from "./CategoryList";
+import CategoryEdit from "./CategoryEdit";
+import CategoryList from "./CategoryList";
 import { Fab } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
@@ -38,7 +38,7 @@ const Category = () => {
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <PropertyList edit={edit} setEdit={openAndEdit} />
+            <CategoryList edit={edit} setEdit={openAndEdit} />
           </Paper>
         </Grid>
         <Fab
@@ -53,7 +53,7 @@ const Category = () => {
           <AddIcon />
         </Fab>
         {openEdit && (
-          <PropertyEdit
+          <CategoryEdit
             open={openEdit}
             setOpen={setOpenEdit}
             edit={edit}

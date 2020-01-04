@@ -94,8 +94,8 @@ const Dashboard = props => {
 
   //tab changes
   const tabLabels = ["Products", "Categories", "Properties"];
-  const [current, setCurrent] = useState(1);
-  const [title, setTitle] = useState(tabLabels[1]);
+  const [current, setCurrent] = useState(0);
+  const [title, setTitle] = useState(tabLabels[0]);
   const handleChange = (event, newValue) => {
     setTitle(tabLabels[newValue]);
     setCurrent(newValue);
