@@ -1,4 +1,5 @@
-import firebase from "firebase/index";
+import firebase, { firebaseApp } from "firebase/index";
+
 import pluralize from "pluralize";
 
 const firestore = firebase.firestore();
@@ -25,44 +26,24 @@ const getRelations = entity => {
   return relations;
 };
 
-export const addService = (entity, type, updateId) => {
-  console.log("Entity", entity);
-  const entityName = pluralize.singular(type);
-  let fields = getFields(entity);
-  let relations = getRelations(entity);
-
-  let action = updateId
-    ? firestore
-        .collection(type)
-        .doc(updateId)
-        .set(fields)
-    : firestore.collection(type).add(fields);
-
-  return action.then(docRef => {
-    relations.forEach(relation => {
-      const key = Object.keys(relation)[0];
-      const values = relation[key];
-      values.forEach(value => {
-        if (docRef) {
-          addService({ ...value, [`${entityName}Id`]: docRef.id }, key);
-        } else {
-          const { id, ...rest } = value;
-          addService({ ...rest, [`${entityName}Id`]: updateId }, key, id);
-        }
-      });
-    });
-  });
+export const functionsAdd = data => {
+  return firebaseApp.functions().httpsCallable("addData")(data);
 };
 
-export const updateService = ({ id, ...rest }, type) => {
-  return addService({ ...rest }, type, id);
+export const addService = (entity, collection, id) => {
+  return functionsAdd({ entity, collection, id });
 };
 
-export const removeService = (type, { id, ...rest }) => {
+export const updateService = ({ id, ...rest }, collection) => {
+  const entity = { ...rest };
+  return addService(entity, collection, id);
+};
+
+export const removeService = (collection, { id, ...rest }) => {
   const relations = getRelations({ ...rest });
 
   return firestore
-    .collection(type)
+    .collection(collection)
     .doc(id)
     .delete()
     .then(() => {

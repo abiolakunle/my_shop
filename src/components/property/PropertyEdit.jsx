@@ -48,7 +48,7 @@ const PropertyEdit = ({ edit, setEdit, open, setOpen }) => {
   //form state management
   const [form, setForm] = useState(initialFormState);
   const resetForm = () => {
-    setEdit(undefined);
+    setEdit && setEdit(undefined);
     setForm(initialFormState);
   };
 

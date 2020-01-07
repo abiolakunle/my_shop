@@ -6,14 +6,13 @@ import {
 
 import { request, success, failure } from "actions/requestActions";
 
-import {  remove } from "services/populateProperty";
+import { remove } from "services/populateProperty";
 import { add, update } from "services/populateServices";
 import { addValue, updateValue } from "actions/propertyValueActions";
 
 const type = "properties";
 
 export const addProperty = property => {
-
   return (dispatch, getState) => {
     dispatch(request(ADD_PROP_REQUEST));
 

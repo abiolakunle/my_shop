@@ -3,9 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { useFirestoreConnect } from "react-redux-firebase";
 import { useAlert } from "react-alert";
 import { add, update, remove } from "actions/populateActions";
+
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
+import AddIcon from "@material-ui/icons/Add";
 import {
   Button,
   CircularProgress,
@@ -17,6 +19,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Fab,
   Input,
   Chip,
   MenuItem,
@@ -26,6 +29,7 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
 
 import ProductPropertyEdit from "./ProductPropertyEdit";
+import CategoryEdit from "components/category/CategoryEdit";
 
 const useStyles = makeStyles(theme => ({
   chipInput: { minWidth: 300, marginBottom: theme.spacing(4) },
@@ -98,7 +102,7 @@ const ProductEdit = ({ edit, setEdit, open, setOpen }) => {
     setForm({ ...form, [event.target.name]: event.target.value });
   };
   const resetForm = () => {
-    setEdit(undefined);
+    setEdit && setEdit(undefined);
     setForm(initialFormState);
   };
 
@@ -152,12 +156,15 @@ const ProductEdit = ({ edit, setEdit, open, setOpen }) => {
       //   //dispatch delete
       //   dispatch(remove(subCollection)(item));
       //});
+      dispatch(update(collection)(form));
     } else {
-      //extract ids of add properties
-
-      dispatch(add(collection)({ ...form }));
+      dispatch(add(collection)(form));
+      //functionsAdd(form);
     }
   };
+
+  const [addCat, setAddCat] = useState(false);
+
   const formInputs = (
     <Grid container spacing={3}>
       <Grid item xs={12}>
@@ -178,26 +185,45 @@ const ProductEdit = ({ edit, setEdit, open, setOpen }) => {
           <InputLabel shrink id="demo-simple-select-placeholder-label-label">
             Category
           </InputLabel>
-          <Select
-            labelId="demo-simple-select-placeholder-label-label"
-            id="demo-simple-select-placeholder-label"
-            value={form.categoryId}
-            name="categoryId"
-            onChange={handleChange}
-            className={classes.selectEmpty}
-          >
-            {categories?.map(category => (
-              <MenuItem
-                //selected={form.categoryId === category.id}
-                value={category.id}
+
+          <Grid container spacing={2}>
+            <Grid item md={10}>
+              <Select
+                labelId="demo-simple-select-placeholder-label-label"
+                id="demo-simple-select-placeholder-label"
+                value={form.categoryId}
+                name="categoryId"
+                onChange={handleChange}
+                className={classes.selectEmpty}
+                fullWidth
               >
-                {category.name}
-              </MenuItem>
-            ))}
-          </Select>
-          <FormHelperText>
-            Select suitable category for this product
-          </FormHelperText>
+                {categories?.map(category => (
+                  <MenuItem
+                    //selected={form.categoryId === category.id}
+                    value={category.id}
+                  >
+                    {category.name}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>
+                Select suitable category for this product
+              </FormHelperText>
+            </Grid>
+            <Grid md={2} item>
+              <Fab
+                size="small"
+                color="primary"
+                aria-label="add"
+                className={classes.margin}
+                onClick={() => {
+                  setAddCat(true);
+                }}
+              >
+                <AddIcon />
+              </Fab>
+            </Grid>
+          </Grid>
         </FormControl>
       </Grid>
     </Grid>
@@ -224,7 +250,7 @@ const ProductEdit = ({ edit, setEdit, open, setOpen }) => {
           >
             <DialogTitle id="scroll-dialog-title">
               {edit ? "Edit " : "Add "}
-              {"category"}
+              {"Product"}
             </DialogTitle>
             <DialogContent dividers={true}>
               {formInputs}
@@ -267,6 +293,7 @@ const ProductEdit = ({ edit, setEdit, open, setOpen }) => {
             </DialogActions>
           </form>
         )}
+        <CategoryEdit setOpen={value => setAddCat(value)} open={addCat} />
       </Dialog>
     </React.Fragment>
   );

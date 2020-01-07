@@ -18,6 +18,11 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(2),
     textAlign: "center",
     color: theme.palette.text.secondary
+  },
+  fab: {
+    position: "absolute",
+    bottom: theme.spacing(3),
+    right: theme.spacing(3)
   }
 }));
 
@@ -44,7 +49,7 @@ const Category = () => {
         <Fab
           color="secondary"
           aria-label="add"
-          className={classes.fabButton}
+          className={classes.fab}
           onClick={() => {
             dispatch(resetPopulate());
             setOpenEdit(true);

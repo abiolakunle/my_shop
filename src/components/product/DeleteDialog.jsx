@@ -13,11 +13,11 @@ import { useFirestoreConnect } from "react-redux-firebase";
 import { CircularProgress } from "@material-ui/core";
 
 const AlertDialog = ({ open, handleClose, item }) => {
-  const collection = "categories";
+  const collection = "products";
   useFirestoreConnect([
     {
-      collection: "categoryProperties",
-      where: ["categoryId", "==", item?.id || ""]
+      collection: "productPropertyValues",
+      where: ["productId", "==", item?.id || ""]
     }
   ]);
 
@@ -27,6 +27,7 @@ const AlertDialog = ({ open, handleClose, item }) => {
   const { sending, sent, error, message } = useSelector(
     state => state.populateReducer
   );
+  console.log("ordered", ordered)
   const alert = useAlert();
   useEffect(() => {
     if (sent || error) {
@@ -38,7 +39,7 @@ const AlertDialog = ({ open, handleClose, item }) => {
   const handleDelete = () => {
     const toDelete = {
       ...item,
-      categoryProperties: ordered.categoryProperties
+      productPropertyValues: ordered.productPropertyValues
     };
     dispatch(remove(collection)(toDelete));
   };
@@ -64,12 +65,12 @@ const AlertDialog = ({ open, handleClose, item }) => {
           <Button
             onClick={handleDelete}
             color="primary"
-            disabled={!!!ordered.categoryProperties}
+            disabled={!!!ordered.productPropertyValues}
             autoFocus
           >
             Delete
           </Button>
-          {(!!!ordered.categoryProperties || sending) && (
+          {(!!!ordered.productPropertyValues || sending) && (
             <CircularProgress size={20} />
           )}
         </DialogActions>

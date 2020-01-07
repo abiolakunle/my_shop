@@ -19,10 +19,13 @@ import {
   Select,
   Input,
   Chip,
-  MenuItem
+  MenuItem,
+  Fab
 } from "@material-ui/core";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
+import AddIcon from "@material-ui/icons/Add";
+import { PropertyEdit } from "components/property";
 
 const useStyles = makeStyles(theme => ({
   chipInput: { minWidth: 300, marginBottom: theme.spacing(4) },
@@ -94,7 +97,7 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
     setForm({ ...form, [event.target.name]: event.target.value });
   };
   const resetForm = () => {
-    setEdit(undefined);
+    setEdit && setEdit(undefined);
     setForm(initialFormState);
   };
 
@@ -212,6 +215,9 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
       alert.show("Please add at least one property value", { type: "info" });
     }
   };
+
+  const [propertyEdit, setAddPropertyEdit] = useState(false);
+
   const formInputs = (
     <Grid container spacing={3}>
       <Grid item xs={12}>
@@ -229,46 +235,64 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
 
       <Grid item xs={12}>
         <FormControl className={classes.formControl}>
-          <InputLabel id="demo-mutiple-chip-label">Properties</InputLabel>
-          <Select
-            labelId="demo-mutiple-chip-label"
-            id="demo-mutiple-chip"
-            multiple
-            value={form.categoryProperties || []}
-            name="categoryProperties"
-            onChange={handleChange}
-            input={<Input id="select-multiple-chip" />}
-            renderValue={selected => (
-              <div className={classes.chips}>
-                {selected.map(value => {
-                  console.log("value", value, "delete", removed);
-                  return (
-                    <Chip
-                      key={value.name}
-                      label={value.name}
-                      className={classes.chip}
-                    />
-                  );
-                })}
-              </div>
-            )}
-            MenuProps={MenuProps}
-          >
-            {allProperties?.map(property => (
-              <MenuItem
-                key={property.id}
-                value={property}
-                style={getStyles(
-                  { removed, added },
-                  property,
-                  form.categoryProperties,
-                  theme
+          <Grid container spacing={2}>
+            <Grid item md={10}>
+              <InputLabel id="demo-mutiple-chip-label">Properties</InputLabel>
+              <Select
+                labelId="demo-mutiple-chip-label"
+                id="demo-mutiple-chip"
+                multiple
+                fullWidth
+                value={form.categoryProperties || []}
+                name="categoryProperties"
+                onChange={handleChange}
+                input={<Input id="select-multiple-chip" />}
+                renderValue={selected => (
+                  <div className={classes.chips}>
+                    {selected.map(value => {
+                      console.log("value", value, "delete", removed);
+                      return (
+                        <Chip
+                          key={value.name}
+                          label={value.name}
+                          className={classes.chip}
+                        />
+                      );
+                    })}
+                  </div>
                 )}
+                MenuProps={MenuProps}
               >
-                {property.name}
-              </MenuItem>
-            ))}
-          </Select>
+                {allProperties?.map(property => (
+                  <MenuItem
+                    key={property.id}
+                    value={property}
+                    style={getStyles(
+                      { removed, added },
+                      property,
+                      form.categoryProperties,
+                      theme
+                    )}
+                  >
+                    {property.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Grid>
+            <Grid item md={2}>
+              <Fab
+                size="small"
+                color="primary"
+                aria-label="add"
+                className={classes.margin}
+                onClick={() => {
+                  setAddPropertyEdit(true);
+                }}
+              >
+                <AddIcon />
+              </Fab>
+            </Grid>
+          </Grid>
         </FormControl>
       </Grid>
     </Grid>
@@ -331,6 +355,10 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
           </form>
         )}
       </Dialog>
+      <PropertyEdit
+        setOpen={value => setAddPropertyEdit(value)}
+        open={propertyEdit}
+      />
     </React.Fragment>
   );
 };

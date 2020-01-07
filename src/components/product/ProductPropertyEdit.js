@@ -99,7 +99,7 @@ const ProductPropertyEdit = ({ categoryId, propertyValues, form, setForm }) => {
   return (
     <div>
       {properties?.map(({ id, name }) => {
-        const selected = form.productPropertyValues.find(item =>
+        const selected = form.productPropertyValues?.find(item =>
           item.hasOwnProperty(id)
         );
         console.log("Seleted ", selected, id);
