@@ -5,11 +5,11 @@ export const request = type => {
   };
 };
 
-export const success = (type, message = "Successful") => {
-  console.log(`Request Success defails >> ${message}`);
+export const success = (type, data = "Successful") => {
+  console.log(`Request Success defails >>`, data);
   return {
     type,
-    payload: message
+    payload: data
   };
 };
 

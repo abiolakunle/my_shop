@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { useFirestoreConnect } from "react-redux-firebase";
 import { useAlert } from "react-alert";
 import { add, update, remove } from "actions/populateActions";
-import { getService, getAllService } from "services/populateServices";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
@@ -61,8 +60,8 @@ const PropertyEdit = ({ edit, setEdit, open, setOpen }) => {
     }
   ]);
 
-  getService("properties", edit.id, ["propertyValues"]);
-  getAllService("properties", ["propertyValues"]);
+  // getService("properties", edit.id, ["propertyValues"]);
+  // getAllService("properties", ["propertyValues"]);
 
   const { ordered, data } = useSelector(state => state.firestoreReducer);
   const propertyValues = ordered?.propertyValues;

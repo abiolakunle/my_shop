@@ -20,23 +20,3 @@ const functionsRemove = data => {
 export const removeService = (collection, entity) => {
   return functionsRemove({ collection, entity });
 };
-
-const functionGet = data => {
-  return firebaseApp.functions().httpsCallable("getData")(data);
-};
-
-export const getService = (collection, id, relations) => {
-  return functionGet({ collection, id, relations }).then(result => {
-    console.log("getREsult", result);
-  });
-};
-
-const functionGetAll = data => {
-  return firebaseApp.functions().httpsCallable("getAllData")(data);
-};
-
-export const getAllService = (collection, relations) => {
-  return functionGetAll({ collection, relations }).then(result => {
-    console.log("getAllREsult", result);
-  });
-};
