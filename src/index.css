@@ -7,6 +7,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+:root {
+  --primary-light: #877af5;
+  --primary-dark: #3722ee;
+  --secondary-dark: #999999;
+  --space2: 8px;
+}
+
 ul {
   list-style-type: none;
   margin: 0;
@@ -17,4 +24,20 @@ ul {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+::-webkit-scrollbar {
+  width: var(--space2);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--primary-light);
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--secondary-dark);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--primary-dark);
 }

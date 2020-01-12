@@ -49,12 +49,14 @@ const CategoryList = props => {
         onClick={event => {
           const dataAction = event.target.getAttribute("data-action");
           const id = event.target.getAttribute("data-id");
-          dispatch(resetPopulate());
+
           switch (dataAction) {
             case "delete":
+              dispatch(resetPopulate());
               deleteDialog(ordered.categories[id]);
               break;
             case "edit":
+              dispatch(resetPopulate());
               props.setEdit(ordered.categories[id]);
               break;
             default:

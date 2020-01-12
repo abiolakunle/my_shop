@@ -17,7 +17,7 @@ export const add = collection => {
   return entity => {
     return (dispatch, getState) => {
       dispatch(request(POPULATE_REQUEST));
-      addService(entity, collection)
+      addService(collection, entity)
         .then(() => {
           dispatch(
             success(POPULATE_SUCCESS, `${entity.name} added to ${collection}`)
@@ -34,7 +34,7 @@ export const update = collection => {
   return entity => {
     return (dispatch, getState) => {
       dispatch(request(POPULATE_REQUEST));
-      updateService(entity, collection)
+      updateService(collection, entity)
         .then(() => {
           dispatch(
             success(POPULATE_SUCCESS, `${entity.name} updated in ${collection}`)

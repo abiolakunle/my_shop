@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useFirestoreConnect } from "react-redux-firebase";
 import { useAlert } from "react-alert";
-import { add, update, remove } from "actions/populateActions";
+import { add, update } from "actions/populateActions";
 
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
@@ -20,15 +20,13 @@ import {
   InputLabel,
   Select,
   Fab,
-  Input,
-  Chip,
   MenuItem,
   FormHelperText
 } from "@material-ui/core";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
 
-import ProductPropertyEdit from "./ProductPropertyEdit";
+import ProductPropertyEdit from "./ProductPropertyEdit.jsx";
 import CategoryEdit from "components/category/CategoryEdit";
 
 const useStyles = makeStyles(theme => ({
@@ -63,16 +61,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const getStyles = ({ deleted, added }, property, properties, theme) => {
-  return {
-    fontWeight:
-      properties.indexOf(property) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-    backgroundColor: "primary !important"
-  };
-};
-
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -87,7 +75,7 @@ const MenuProps = {
 const ProductEdit = ({ edit, setEdit, open, setOpen }) => {
   const classes = useStyles();
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   //redux
   const dispatch = useDispatch();
@@ -95,10 +83,9 @@ const ProductEdit = ({ edit, setEdit, open, setOpen }) => {
   const initialFormState = { name: "", categoryId: "" };
   //form state management
   const [form, setForm] = useState(initialFormState);
-  console.log("form", form);
+  console.log("form -", form);
 
   const handleChange = event => {
-    console.log("change", event.target);
     setForm({ ...form, [event.target.name]: event.target.value });
   };
   const resetForm = () => {
@@ -118,12 +105,15 @@ const ProductEdit = ({ edit, setEdit, open, setOpen }) => {
   ]);
   //get ordered data from firestore reducer
   const { ordered, data } = useSelector(state => state.firestoreReducer);
-  const { categories, productPropertyValues } = ordered;
 
   //set productPropertyValue
   useEffect(() => {
-    edit && setForm({ ...edit, productPropertyValues });
-  }, [edit, productPropertyValues]);
+    edit &&
+      setForm({
+        ...edit,
+        productPropertyValues: ordered.productPropertyValues
+      });
+  }, [edit, ordered]);
 
   //handle alerts and progress
   const alert = useAlert();
@@ -143,23 +133,9 @@ const ProductEdit = ({ edit, setEdit, open, setOpen }) => {
   const handleSubmit = event => {
     event.preventDefault();
     if (edit) {
-      // //extract ids of added properties
-      // const AddedPropertyIds = added.map(property => ({
-      //   propertyId: property.id
-      // }));
-      // const dbForm = { ...form, categoryProperties: AddedPropertyIds };
-      // //dispatch update
-      // dispatch(update(collection)(dbForm));
-      // //subCollection items to delete
-      // const subCollection = "categoryProperties";
-      // getRemovedIds(removed, ordered.categoryProperties).forEach(item => {
-      //   //dispatch delete
-      //   dispatch(remove(subCollection)(item));
-      //});
       dispatch(update(collection)(form));
     } else {
       dispatch(add(collection)(form));
-      //functionsAdd(form);
     }
   };
 
@@ -182,12 +158,14 @@ const ProductEdit = ({ edit, setEdit, open, setOpen }) => {
 
       <Grid item xs={12}>
         <FormControl className={classes.formControl}>
-          <InputLabel shrink id="demo-simple-select-placeholder-label-label">
-            Category
-          </InputLabel>
-
           <Grid container spacing={2}>
             <Grid item md={10}>
+              <InputLabel
+                shrink
+                id="demo-simple-select-placeholder-label-label"
+              >
+                Category
+              </InputLabel>
               <Select
                 labelId="demo-simple-select-placeholder-label-label"
                 id="demo-simple-select-placeholder-label"
@@ -196,8 +174,9 @@ const ProductEdit = ({ edit, setEdit, open, setOpen }) => {
                 onChange={handleChange}
                 className={classes.selectEmpty}
                 fullWidth
+                MenuProps={MenuProps}
               >
-                {categories?.map(category => (
+                {ordered.categories?.map(category => (
                   <MenuItem
                     //selected={form.categoryId === category.id}
                     value={category.id}
@@ -254,14 +233,7 @@ const ProductEdit = ({ edit, setEdit, open, setOpen }) => {
             </DialogTitle>
             <DialogContent dividers={true}>
               {formInputs}
-              {form.categoryId && (
-                <ProductPropertyEdit
-                  propertyValues={productPropertyValues}
-                  categoryId={form.categoryId}
-                  form={form}
-                  setForm={setForm}
-                />
-              )}
+              {<ProductPropertyEdit form={form} setForm={setForm} />}
               <Box className={classes.center}>
                 {sending && <CircularProgress />}
               </Box>

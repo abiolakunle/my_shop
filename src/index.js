@@ -14,6 +14,10 @@ import { createFirestoreInstance } from "redux-firestore";
 import { Provider as AlertProvider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
 import { alertOptions } from "helpers/alert";
+//import DateFnsUtils from "@date-io/date-fns";
+import MomentUtils from "@date-io/moment";
+//import LuxonUtils from "@date-io/luxon";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 
 const reactReduxfirebaseProps = {
   firebase,
@@ -26,7 +30,9 @@ ReactDOM.render(
     <SnackbarProvider maxSnack={3}>
       <Provider store={store}>
         <AlertProvider template={AlertTemplate} {...alertOptions}>
-          <App />
+          <MuiPickersUtilsProvider utils={MomentUtils}>
+            <App />
+          </MuiPickersUtilsProvider>
         </AlertProvider>
       </Provider>
     </SnackbarProvider>
@@ -37,4 +43,4 @@ ReactDOM.render(
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+serviceWorker.register();

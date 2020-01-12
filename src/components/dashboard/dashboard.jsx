@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useSnackbar } from "notistack";
 import { Product } from "components/product/index";
 import { Category } from "components/category/index";
 import { Property } from "components/property/index";
+import { StoreTabs } from "components/store/index";
 import { signOut } from "actions/authActions";
 
 import AppBar from "@material-ui/core/AppBar";
@@ -12,7 +13,6 @@ import Divider from "@material-ui/core/Divider";
 import Drawer from "@material-ui/core/Drawer";
 import Hidden from "@material-ui/core/Hidden";
 import IconButton from "@material-ui/core/IconButton";
-import Box from "@material-ui/core/Box";
 import MenuIcon from "@material-ui/icons/Menu";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -20,6 +20,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
+import Order from "components/order/Order";
 
 const drawerWidth = 240;
 
@@ -35,20 +36,20 @@ const useStyles = makeStyles(theme => ({
     display: "flex"
   },
   drawer: {
-    [theme.breakpoints.up("sm")]: {
+    [theme.breakpoints.up("lg")]: {
       width: drawerWidth,
       flexShrink: 0
     }
   },
   appBar: {
-    [theme.breakpoints.up("md")]: {
+    [theme.breakpoints.up("lg")]: {
       width: `calc(100% - ${drawerWidth}px)`,
       marginLeft: drawerWidth
     }
   },
   menuButton: {
     marginRight: theme.spacing(2),
-    [theme.breakpoints.up("sm")]: {
+    [theme.breakpoints.up("lg")]: {
       display: "none"
     }
   },
@@ -58,7 +59,7 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3)
+    padding: theme.spacing(1)
   }
 }));
 
@@ -74,7 +75,7 @@ const TabPanel = props => {
       aria-labelledby={`vertical-tab-${index}`}
       {...other}
     >
-      {value === index && <Box p={3}>{children}</Box>}
+      {value === index && <Fragment p={1}>{children}</Fragment>}
     </Typography>
   );
 };
@@ -93,7 +94,11 @@ const Dashboard = props => {
   const dispatch = useDispatch();
 
   //tab changes
-  const tabLabels = ["Products", "Categories", "Properties"];
+  const tabLabels = ["Orders", "Store"];
+  const tabs = [
+    { label: "Orders", comp: <Order /> },
+    { label: "Store", comp: <StoreTabs /> }
+  ];
   const [current, setCurrent] = useState(0);
   const [title, setTitle] = useState(tabLabels[0]);
   const handleChange = (event, newValue) => {
@@ -127,7 +132,7 @@ const Dashboard = props => {
         aria-label="Vertical tabs example"
         className={classes.tabs}
       >
-        {tabLabels.map((label, index) => {
+        {tabs.map(({ label }, index) => {
           return <Tab label={label} key={index} {...a11yProps(index)} />;
         })}
       </Tabs>
@@ -164,7 +169,7 @@ const Dashboard = props => {
       </AppBar>
       <nav className={classes.drawer} aria-label="mailbox folders">
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-        <Hidden mdUp implementation="css">
+        <Hidden lgUp implementation="css">
           <Drawer
             container={container}
             variant="temporary"
@@ -182,7 +187,7 @@ const Dashboard = props => {
             {drawer}
           </Drawer>
         </Hidden>
-        <Hidden xsDown implementation="css">
+        <Hidden mdDown implementation="css">
           <Drawer
             classes={{
               paper: classes.drawerPaper
@@ -196,15 +201,13 @@ const Dashboard = props => {
       </nav>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <TabPanel value={current} index={0}>
-          <Product />
-        </TabPanel>
-        <TabPanel value={current} index={1}>
-          <Category />
-        </TabPanel>
-        <TabPanel value={current} index={2}>
-          <Property />
-        </TabPanel>
+        {tabs.map(({ comp }, index) => {
+          return (
+            <TabPanel value={current} index={index}>
+              {comp}
+            </TabPanel>
+          );
+        })}
       </main>
     </div>
   );

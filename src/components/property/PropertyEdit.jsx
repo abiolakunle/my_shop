@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useFirestoreConnect } from "react-redux-firebase";
 import { useAlert } from "react-alert";
 import { add, update, remove } from "actions/populateActions";
+import { getService, getAllService } from "services/populateServices";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
@@ -39,7 +40,7 @@ const useStyles = makeStyles(theme => ({
 const PropertyEdit = ({ edit, setEdit, open, setOpen }) => {
   const classes = useStyles();
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   //redux
   const dispatch = useDispatch();
@@ -52,8 +53,6 @@ const PropertyEdit = ({ edit, setEdit, open, setOpen }) => {
     setForm(initialFormState);
   };
 
-  console.log("form ..", form);
-
   // firestore
   useFirestoreConnect([
     {
@@ -61,6 +60,10 @@ const PropertyEdit = ({ edit, setEdit, open, setOpen }) => {
       where: ["propertyId", "==", edit?.id || ""]
     }
   ]);
+
+  getService("properties", edit.id, ["propertyValues"]);
+  getAllService("properties", ["propertyValues"]);
+
   const { ordered, data } = useSelector(state => state.firestoreReducer);
   const propertyValues = ordered?.propertyValues;
   useEffect(() => {

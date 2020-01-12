@@ -1,7 +1,8 @@
 import React, { Fragment, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { addProduct, removeProduct } from "actions/orderActions";
 import DeleteDialog from "./DeleteDialog";
-import { resetPopulate } from "actions/populateActions";
+import { resetPopulate, remove } from "actions/populateActions";
 
 import { useFirestoreConnect } from "react-redux-firebase";
 import {
@@ -14,17 +15,23 @@ import {
   ListItemAvatar,
   Avatar as MaterialAvatar,
   CircularProgress,
-  ButtonBase
+  ButtonBase,
+  ButtonGroup
 } from "@material-ui/core";
 import Avatar from "react-avatar";
 import EditIcon from "@material-ui/icons/Edit";
+import AddShoppingCartIcon from "@material-ui/icons/AddShoppingCart";
+import RemoveShoppingCartIcon from "@material-ui/icons/RemoveShoppingCart";
 import DeleteIcon from "@material-ui/icons/Delete";
 
 const ListButton = ({ children, ...rest }) => {
   return (
     <ButtonBase style={{ "border-radius": "50%" }} {...rest}>
       <IconButton style={{ "pointer-events": "none" }}>
-        {React.cloneElement(children, { style: { "pointer-events": "none" } })}
+        {React.cloneElement(children, {
+          ...rest,
+          style: { "pointer-events": "none" }
+        })}
       </IconButton>
     </ButtonBase>
   );
@@ -42,25 +49,40 @@ const ProductList = props => {
   const deleteDialog = item => {
     setDeleteItem(deleteItem ? undefined : item);
   };
+
+  const doListAction = event => {
+    const dataAction = event.target.getAttribute("data-action");
+    const itemId = event.target.getAttribute("data-id");
+    switch (dataAction) {
+      case "delete":
+        dispatch(resetPopulate());
+        deleteDialog(ordered.products[itemId]);
+        break;
+      case "edit":
+        dispatch(resetPopulate());
+        props.setEdit(undefined);
+        props.setEdit(ordered.products[itemId]);
+        break;
+      case "order-add":
+        const { id, name } = ordered.products[itemId];
+        dispatch(
+          addProduct({ id, name, quantity: "1", unit: "piece(s)", price: "0" })
+        );
+        break;
+      case "order-remove":
+        dispatch(removeProduct(ordered.products[itemId].id));
+        break;
+      default:
+    }
+  };
+
+  //order
+  const { orderProducts } = useSelector(state => state.orderReducer);
+
   return (
     <div>
-      Category List
-      <div
-        onClick={event => {
-          const dataAction = event.target.getAttribute("data-action");
-          const id = event.target.getAttribute("data-id");
-          dispatch(resetPopulate());
-          switch (dataAction) {
-            case "delete":
-              deleteDialog(ordered.products[id]);
-              break;
-            case "edit":
-              props.setEdit(ordered.products[id]);
-              break;
-            default:
-          }
-        }}
-      >
+      Product List
+      <div onClick={doListAction}>
         <List dense={true}>
           {!data.products &&
             !status?.requesting.products &&
@@ -70,7 +92,7 @@ const ProductList = props => {
             ordered.products.map((item, index) => {
               return (
                 <Fragment key={index}>
-                  <ListItem>
+                  <ListItem dense>
                     <ListItemAvatar>
                       <MaterialAvatar>
                         <Avatar name={item.name[0]} />
@@ -81,6 +103,28 @@ const ProductList = props => {
                       // secondary={""}
                     />
                     <ListItemSecondaryAction>
+                      {orderProducts.map(p => p.id).includes(item.id) ? (
+                        <ListButton
+                          color="primary"
+                          aria-label="remove from order"
+                          data-action="order-remove"
+                          edge="end"
+                          data-id={index}
+                        >
+                          <RemoveShoppingCartIcon />
+                        </ListButton>
+                      ) : (
+                        <ListButton
+                          color="primary"
+                          aria-label="add to order"
+                          data-action="order-add"
+                          edge="end"
+                          data-id={index}
+                        >
+                          <AddShoppingCartIcon />
+                        </ListButton>
+                      )}
+
                       <ListButton
                         data-action="edit"
                         edge="end"

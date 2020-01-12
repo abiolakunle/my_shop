@@ -19,10 +19,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const ProductPropertyEdit = ({ categoryId, propertyValues, form, setForm }) => {
+const ProductPropertyEdit = ({ form, setForm }) => {
   const classes = useStyles();
 
-  const { ordered, status } = useSelector(state => {
+  const { ordered } = useSelector(state => {
     console.log("store", state.firestoreReducer);
     return state.firestoreReducer;
   });
@@ -40,7 +40,7 @@ const ProductPropertyEdit = ({ categoryId, propertyValues, form, setForm }) => {
           storeAs: propertyId
         };
       }) || [];
-    console.log("Queries", queries);
+
     setPropertyQueries(queries);
   }, [categoryProperties]);
 
@@ -57,8 +57,9 @@ const ProductPropertyEdit = ({ categoryId, propertyValues, form, setForm }) => {
 
   //create propertyValues queries from properties
   const [valueQueries, setValueQueries] = useState([]);
-  console.log("valueQ", valueQueries);
+
   useEffect(() => {
+    console.log("properties", properties);
     const queries =
       properties?.map(({ id }) => {
         return {
@@ -74,15 +75,11 @@ const ProductPropertyEdit = ({ categoryId, propertyValues, form, setForm }) => {
   useFirestoreConnect([
     {
       collection: "categoryProperties",
-      where: ["categoryId", "==", categoryId]
+      where: ["categoryId", "==", form?.categoryId || ""]
     },
     ...propertyQueries,
     ...valueQueries
   ]);
-
-  const handleChange = event => {
-    console.log("event target", event.target);
-  };
 
   const handleSelectChange = event => {
     const name = event.target.name;
@@ -102,7 +99,6 @@ const ProductPropertyEdit = ({ categoryId, propertyValues, form, setForm }) => {
         const selected = form.productPropertyValues?.find(item =>
           item.hasOwnProperty(id)
         );
-        console.log("Seleted ", selected, id);
         return (
           <FormControl required className={classes.formControl}>
             <InputLabel id="demo-simple-select-required-label">

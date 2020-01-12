@@ -49,12 +49,14 @@ const PropertyList = props => {
         onClick={event => {
           const dataAction = event.target.getAttribute("data-action");
           const id = event.target.getAttribute("data-id");
-          dispatch(resetPopulate());
+
           switch (dataAction) {
             case "delete":
+              dispatch(resetPopulate());
               deleteDialog(ordered.properties[id]);
               break;
             case "edit":
+              dispatch(resetPopulate());
               props.setEdit(ordered.properties[id]);
               break;
             default:

@@ -7,16 +7,19 @@ import { SignUp } from "../SignUp/index";
 
 //material-ui
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
 
 import home_bg from "./home_bg.svg";
 
 import { makeStyles } from "@material-ui/core/styles";
 
-const useStyles = makeStyles(theme => ({
-  paper: {
-    opacity: 0.95,
-    margin: theme.spacing(10)
+const useStyles = makeStyles(() => ({
+  center: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "column",
+    width: "100%",
+    textAlign: "center"
   },
 
   container: {
@@ -36,17 +39,16 @@ const Home = ({ history }) => {
   return (
     <div className={classes.container}>
       <Header />
-      <Fragment>
-        <Paper className={classes.paper}>
-          <Grid container alignItems="center" spacing={2}>
-            <Grid item md={6}>
-              <SignIn />
-            </Grid>
-            <Grid item md={6}>
-              <SignUp />
-            </Grid>
+      <Fragment className={classes.center}>
+        <Grid container spacing={1}>
+          <Grid item md={6}>
+            <SignIn />
           </Grid>
-        </Paper>
+          <Grid item md={6}>
+            <SignUp />
+          </Grid>
+        </Grid>
+
         <Footer />
       </Fragment>
     </div>

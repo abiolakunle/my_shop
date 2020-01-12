@@ -24,10 +24,11 @@ const AlertDialog = ({ open, handleClose, item }) => {
   //redux
   const dispatch = useDispatch();
   const { ordered } = useSelector(state => state.firestoreReducer);
-  const { sending, sent, error, message } = useSelector(
-    state => state.populateReducer
-  );
-  console.log("ordered", ordered)
+  const { sending, sent, error, message } = useSelector(state => {
+    console.log("propreducer", state.populateReducer);
+    return state.populateReducer;
+  });
+
   const alert = useAlert();
   useEffect(() => {
     if (sent || error) {
@@ -65,7 +66,7 @@ const AlertDialog = ({ open, handleClose, item }) => {
           <Button
             onClick={handleDelete}
             color="primary"
-            disabled={!!!ordered.productPropertyValues}
+            disabled={!!!ordered.productPropertyValues || sending}
             autoFocus
           >
             Delete

@@ -83,7 +83,7 @@ const MenuProps = {
 const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
   const classes = useStyles();
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   //redux
   const dispatch = useDispatch();
@@ -236,7 +236,7 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
       <Grid item xs={12}>
         <FormControl className={classes.formControl}>
           <Grid container spacing={2}>
-            <Grid item md={10}>
+            <Grid item md={9}>
               <InputLabel id="demo-mutiple-chip-label">Properties</InputLabel>
               <Select
                 labelId="demo-mutiple-chip-label"
@@ -279,7 +279,7 @@ const CategoryEdit = ({ edit, setEdit, open, setOpen }) => {
                 ))}
               </Select>
             </Grid>
-            <Grid item md={2}>
+            <Grid item md={3}>
               <Fab
                 size="small"
                 color="primary"

@@ -64,7 +64,7 @@ const AlertDialog = ({ open, handleClose, item }) => {
           <Button
             onClick={handleDelete}
             color="primary"
-            disabled={!!!ordered.categoryProperties}
+            disabled={!!!ordered.categoryProperties || sending}
             autoFocus
           >
             Delete

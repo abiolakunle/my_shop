@@ -12,12 +12,14 @@ import { Fab } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
+    position: "relative"
   },
   paper: {
     padding: theme.spacing(2),
     textAlign: "center",
-    color: theme.palette.text.secondary
+    color: theme.palette.text.secondary,
+    paddingBottom: theme.spacing(12)
   },
   fab: {
     position: "absolute",
@@ -40,7 +42,7 @@ const Product = () => {
 
   return (
     <div className={classes.root}>
-      <Grid container spacing={3}>
+      <Grid container spacing={1}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <ProductList edit={edit} setEdit={openAndEdit} />
